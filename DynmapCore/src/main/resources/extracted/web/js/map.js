@@ -746,21 +746,8 @@ DynMap.prototype = {
 	},
 	onTileUpdated: function(tileName,timestamp) {
 		var me = this;
-		var prev = this.registeredTiles[tileName];
-		var a_b = true;
-		if (prev && (prev.indexOf('upd=0') > 0))
-			a_b = false;
 		var url = me.options.url.tiles;
-		if (a_b) {
-			if (url.indexOf('?') > 0) {
-				this.registeredTiles[tileName] = url + escape(me.world.name + '/' + tileName) + '&upd=0';
-			}
-			else {
-				this.registeredTiles[tileName] = url + escape(me.world.name + '/' + tileName) + '?upd=0';
-			}
-		}
-		else
-			this.registeredTiles[tileName] = url + me.world.name + '/' + tileName;
+		this.registeredTiles[tileName] = url + escape(me.world.name + '/' + tileName);
 		me.maptype.updateNamedTile(tileName);
 	},
 	addPlayer: function(update) {
