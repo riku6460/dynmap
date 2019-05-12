@@ -297,7 +297,7 @@ public class FileTreeMapStorage extends MapStorage {
                     }
                 }
             };
-            timer.scheduleAtFixedRate(task, 0, 10000);
+            timer.scheduleAtFixedRate(task, 0, 1000);
         }
 
         return true;
