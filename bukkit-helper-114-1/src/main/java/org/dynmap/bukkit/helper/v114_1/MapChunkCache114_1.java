@@ -1,4 +1,4 @@
-package org.dynmap.bukkit.helper.v114;
+package org.dynmap.bukkit.helper.v114_1;
 
 import org.bukkit.block.Biome;
 import org.bukkit.craftbukkit.v1_14_R1.CraftWorld;
@@ -26,7 +26,7 @@ import net.minecraft.server.v1_14_R1.NBTTagList;
 /**
  * Container for managing chunks - dependent upon using chunk snapshots, since rendering is off server thread
  */
-public class MapChunkCache114 extends AbstractMapChunkCache {
+public class MapChunkCache114_1 extends AbstractMapChunkCache {
 
 	public static class NBTSnapshot implements Snapshot {
 	    private static interface Section {
