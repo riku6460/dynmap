@@ -2,3 +2,4 @@ version: "1"
 rules:
   - base: cf-cache
     upstream: webbukkit:v3.0
+    mergeMethod: hardreset
