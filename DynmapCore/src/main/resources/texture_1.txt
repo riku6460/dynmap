@@ -2172,6 +2172,60 @@ block:id=horn_coral,patch0-1=0:horn_coral,transparency=TRANSPARENT
 [1.14-]texture:id=smooth_stone
 [1.14-]texture:id=bamboo_stage0
 [1.14-]texture:id=bamboo_stalk
+[1.14-]texture:id=scaffolding_top
+[1.14-]texture:id=scaffolding_side
+[1.14-]texture:id=scaffolding_bottom
+[1.14-]texture:id=composter_top
+[1.14-]texture:id=composter_side
+[1.14-]texture:id=composter_bottom
+[1.14-]texture:id=jigsaw_bottom
+[1.14-]texture:id=jigsaw_side
+[1.14-]texture:id=jigsaw_top
+[1.14-]texture:id=loom_bottom
+[1.14-]texture:id=loom_side
+[1.14-]texture:id=loom_top
+[1.14-]texture:id=loom_front
+[1.14-]texture:id=barrel_bottom
+[1.14-]texture:id=barrel_side
+[1.14-]texture:id=barrel_top
+[1.14-]texture:id=barrel_top_open
+[1.14-]texture:id=smoker_bottom
+[1.14-]texture:id=smoker_side
+[1.14-]texture:id=smoker_top
+[1.14-]texture:id=smoker_front_on
+[1.14-]texture:id=smoker_front
+[1.14-]texture:id=blast_furnace_side
+[1.14-]texture:id=blast_furnace_top
+[1.14-]texture:id=blast_furnace_front_on
+[1.14-]texture:id=blast_furnace_front
+[1.14-]texture:id=cartography_table_top
+[1.14-]texture:id=cartography_table_side1
+[1.14-]texture:id=cartography_table_side2
+[1.14-]texture:id=cartography_table_side3
+[1.14-]texture:id=fletching_table_top
+[1.14-]texture:id=fletching_table_front
+[1.14-]texture:id=fletching_table_side
+[1.14-]texture:id=sweet_berry_bush_stage0
+[1.14-]texture:id=sweet_berry_bush_stage1
+[1.14-]texture:id=sweet_berry_bush_stage2
+[1.14-]texture:id=sweet_berry_bush_stage3
+[1.14-]texture:id=grindstone_pivot
+[1.14-]texture:id=grindstone_round
+[1.14-]texture:id=grindstone_side
+[1.14-]texture:id=lectern_base
+[1.14-]texture:id=lectern_front
+[1.14-]texture:id=lectern_sides
+[1.14-]texture:id=lectern_top
+[1.14-]texturefile:id=lantern,filename=assets/minecraft/textures/block/lantern.png,format=CUSTOM,tile0=0:0/6:10/5:3,xcount=1,ycount=3
+[1.14-]texture:id=smithing_table_front
+[1.14-]texture:id=smithing_table_side
+[1.14-]texture:id=smithing_table_top
+[1.14-]texture:id=smithing_table_bottom
+[1.14-]texture:id=stonecutter_bottom
+[1.14-]texture:id=stonecutter_top
+[1.14-]texture:id=stonecutter_side
+[1.14-]texture:id=stonecutter_saw
+
 # Signpost
 [1.14-]block:id=oak_sign,patch0=0,patch1=1,patch2=2,patch3=3,patch4=4,patch5=5,patch6=6,patch7=7,patch8=8,patch9=9,transparency=TRANSPARENT,txtid=oak_sign
 [1.14-]block:id=spruce_sign,patch0=0,patch1=1,patch2=2,patch3=3,patch4=4,patch5=5,patch6=6,patch7=7,patch8=8,patch9=9,transparency=TRANSPARENT,txtid=spruce_sign
@@ -2280,3 +2334,64 @@ block:id=horn_coral,patch0-1=0:horn_coral,transparency=TRANSPARENT
 # Diorite slab
 [1.14-]block:id=diorite_slab,data=0,data=1,data=2,data=3,allsides=0:diorite,topbottom=0:diorite,stdrot=true,transparency=SEMITRANSPARENT
 [1.14-]block:id=diorite_slab,data=4,data=5,allsides=0:diorite,topbottom=0:diorite,stdrot=true
+# Brick wall
+[1.14-]block:id=brick_wall,patch0-2=0:bricks,transparency=TRANSPARENT
+# Prismarine wall
+[1.14-]block:id=prismarine_wall,patch0-2=0:prismarine,transparency=TRANSPARENT
+# Red sandstone wall
+[1.14-]block:id=red_sandstone_wall,patch0-2=0:red_sandstone,transparency=TRANSPARENT
+# Mossy stone brick wall
+[1.14-]block:id=mossy_stone_brick_wall,patch0-2=0:mossy_stone_bricks,transparency=TRANSPARENT
+# Granite wall
+[1.14-]block:id=granite_wall,patch0-2=0:granite,transparency=TRANSPARENT
+# Stone brick wall
+[1.14-]block:id=stone_brick_wall,patch0-2=0:stone_bricks,transparency=TRANSPARENT
+# Nether brick wall
+[1.14-]block:id=nether_brick_wall,patch0-2=0:nether_bricks,transparency=TRANSPARENT
+# Andesite wall
+[1.14-]block:id=andesite_wall,patch0-2=0:andesite,transparency=TRANSPARENT
+# Red nether brick wall
+[1.14-]block:id=red_nether_brick_wall,patch0-2=0:red_nether_bricks,transparency=TRANSPARENT
+# Sandstone wall
+[1.14-]block:id=sandstone_wall,patch0-2=0:sandstone,transparency=TRANSPARENT
+# End stone brick wall
+[1.14-]block:id=end_stone_brick_wall,patch0-2=0:end_stone_bricks,transparency=TRANSPARENT
+# Diorite wall
+[1.14-]block:id=diorite_wall,patch0-2=0:diorite,transparency=TRANSPARENT
+# Scaffolding
+[1.14-]block:id=scaffolding,patch0=0:scaffolding_top,patch1=0:scaffolding_side,patch2=0:scaffolding_bottom,transparency=TRANSPARENT
+# Composter
+[1.14-]block:id=composter,patch0=0:composter_top,patch1=0:composter_bottom,patch2=0:composter_side,patch3=0:composter_bottom,transparency=TRANSPARENT
+# Jigsaw
+[1.14-]block:id=jigsaw,patch0=0:jigsaw_bottom,patch1=0:jigsaw_top,patch2=0:jigsaw_side
+# Loom
+[1.14-]block:id=loom,patch0=0:loom_bottom,patch1=0:loom_top,patch2=0:loom_front,patch3=0:loom_side
+# Barrel
+[1.14-]block:id=barrel,data=0,data=2,data=4,data=6,data=8,data=10,patch0=0:barrel_bottom,patch1=0:barrel_top_open,patch2=0:barrel_side
+[1.14-]block:id=barrel,data=1,data=3,data=5,data=7,data=9,data=11,patch0=0:barrel_bottom,patch1=0:barrel_top,patch2=0:barrel_side
+# Smoker
+[1.14-]block:id=smoker,data=0,data=2,data=4,data=6,patch0=0:smoker_bottom,patch1=0:smoker_top,patch2=0:smoker_front_on,patch3=0:smoker_side
+[1.14-]block:id=smoker,data=1,data=3,data=5,data=7,patch0=0:smoker_bottom,patch1=0:smoker_top,patch2=0:smoker_front,patch3=0:smoker_side
+# Blast furnace
+[1.14-]block:id=blast_furnace,data=0,data=2,data=4,data=6,patch0=0:blast_furnace_top,patch1=0:blast_furnace_top,patch2=0:blast_furnace_front_on,patch3=0:blast_furnace_side
+[1.14-]block:id=blast_furnace,data=1,data=3,data=5,data=7,patch0=0:blast_furnace_top,patch1=0:blast_furnace_top,patch2=0:blast_furnace_front,patch3=0:blast_furnace_side
+# Cartography Table
+[1.14-]block:id=cartography_table,top=0:cartography_table_top,bottom=0:dark_oak_planks,east=0:cartography_table_side3,west=0:cartography_table_side1,north=0:cartography_table_side2,south=0:cartography_table_side3,stdrot=true
+# Fletching Table
+[1.14-]block:id=fletching_table,top=0:fletching_table_top,bottom=0:birch_planks,east=0:fletching_table_front,west=0:fletching_table_front,north=0:fletching_table_side,south=0:fletching_table_side,stdrot=true
+# Sweet berry bush
+[1.14-]block:id=sweet_berry_bush,data=0,patch0-1=0:sweet_berry_bush_stage0,transparency=TRANSPARENT
+[1.14-]block:id=sweet_berry_bush,data=1,patch0-1=0:sweet_berry_bush_stage1,transparency=TRANSPARENT
+[1.14-]block:id=sweet_berry_bush,data=2,patch0-1=0:sweet_berry_bush_stage2,transparency=TRANSPARENT
+[1.14-]block:id=sweet_berry_bush,data=3,patch0-1=0:sweet_berry_bush_stage3,transparency=TRANSPARENT
+# Grindstone
+[1.14-]block:id=grindstone,patch0=0:grindstone_pivot,patch1=0:grindstone_round,patch2=0:grindstone_side,patch4=0:dark_oak_log,transparency=TRANSPARENT
+# Lectern
+[1.14-]block:id=lectern,patch0=0:oak_planks,patch1=0:lectern_base,patch2=0:lectern_front,patch3=0:lectern_sides,patch4=0:lectern_top,transparency=TRANSPARENT
+# Lantern
+[1.14-]block:id=lantern,patch0=0:lantern,transparency=TRANSPARENT
+# Smithing table
+[1.14-]block:id=smithing_table,top=0:smithing_table_top,bottom=0:smithing_table_bottom,north=0:smithing_table_side,south=0:smithing_table_side,east=0:smithing_table_front,west=0:smithing_table_front,stdrot=true
+# Stonecutter
+[1.14-]block:id=stonecutter,patch0=0:stonecutter_bottom,patch1=0:stonecutter_top,patch2=0:stonecutter_side,patch3=0:stonecutter_saw,transparency=TRANSPARENT
+
