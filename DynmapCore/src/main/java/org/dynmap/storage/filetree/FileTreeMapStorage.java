@@ -12,9 +12,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 import java.util.StringJoiner;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.dynmap.ConfigurationNode;
 import org.dynmap.DynmapCore;
@@ -38,7 +40,7 @@ public class FileTreeMapStorage extends MapStorage {
     private TileHashManager hashmap;
     private static final int MAX_WRITE_RETRIES = 6;
     private static final Charset UTF8 = Charset.forName("UTF-8");
-    private final List<String> CLOUDFLARE_PURGES = new ArrayList<>();
+    private final Queue<String> CLOUDFLARE_PURGES = new ConcurrentLinkedQueue<>();
 
     public class StorageTile extends MapStorageTile {
         private final String baseFilename;
@@ -270,7 +272,7 @@ public class FileTreeMapStorage extends MapStorage {
 
                     List<String> paths = new ArrayList<>();
                     for (int i = 0; i < 30 && i < size; i++) {
-                        paths.add(node.get("url") + CLOUDFLARE_PURGES.remove(0));
+                        paths.add(node.get("url") + CLOUDFLARE_PURGES.poll());
                     }
 
                     try {
