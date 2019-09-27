@@ -442,7 +442,7 @@ dump-missing-blocks: false
 
 cloudflare:
   enable: false
-  url: "https://example.com"
+  url: "https://example.com/tiles/"
   zone_id: ""
   email: ""
   key: ""

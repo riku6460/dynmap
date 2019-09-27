@@ -8,7 +8,9 @@ import java.io.RandomAccessFile;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -40,7 +42,7 @@ public class FileTreeMapStorage extends MapStorage {
     private TileHashManager hashmap;
     private static final int MAX_WRITE_RETRIES = 6;
     private static final Charset UTF8 = Charset.forName("UTF-8");
-    private final Queue<String> CLOUDFLARE_PURGES = new ConcurrentLinkedQueue<>();
+    private final Queue<String> cloudflarePurges = new ConcurrentLinkedQueue<>();
 
     public class StorageTile extends MapStorageTile {
         private final String baseFilename;
@@ -171,15 +173,6 @@ public class FileTreeMapStorage extends MapStorage {
             if (zoom == 0) {
                 world.enqueueZoomOutUpdate(this);
             }
-
-            String[] paths = ff.getPath().split(File.separator.equals("\\") ? "\\\\" : "/");
-            StringJoiner joiner = new StringJoiner("/", "/", "");
-
-            for (int i = paths.length - 5; i < paths.length; ++i) {
-                joiner.add(paths[i]);
-            }
-
-            CLOUDFLARE_PURGES.add(joiner.toString());
             return true;
         }
 
@@ -267,12 +260,12 @@ public class FileTreeMapStorage extends MapStorage {
             TimerTask task = new TimerTask() {
                 @Override
                 public void run() {
-                    int size = CLOUDFLARE_PURGES.size();
+                    int size = cloudflarePurges.size();
                     if (size <= 0) return;
 
                     List<String> paths = new ArrayList<>();
                     for (int i = 0; i < 30 && i < size; i++) {
-                        paths.add(node.get("url") + CLOUDFLARE_PURGES.poll());
+                        paths.add(node.get("url") + cloudflarePurges.poll());
                     }
 
                     try {
@@ -669,6 +662,15 @@ public class FileTreeMapStorage extends MapStorage {
                 if (f.exists()) {
                     f.renameTo(fold);
                     fnew.renameTo(f);
+
+                    if (!Arrays.equals(Files.readAllBytes(f.toPath()), Files.readAllBytes(fold.toPath()))) {
+                        String path = baseTileDir.toURI().relativize(f.toURI()).getPath();
+                        if (File.separator.equals("\\")) {
+                            path = path.replace("\\", "/");
+                        }
+                        cloudflarePurges.add(path);
+                    }
+
                     fold.delete();
                 }
                 else {
