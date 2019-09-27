@@ -62,7 +62,7 @@ public class PaperMapChunkCache113_2 extends MapChunkCache113_2 {
             }
 
             count.incrementAndGet();
-            w.getChunkAtAsync(chunk.x, chunk.z, false).thenAcceptAsync(c -> {
+            w.getChunkAtAsync(chunk.x, chunk.z).thenAcceptAsync(c -> {
                 long inhabited_ticks = 0;
                 DynIntHashMap tileData = null;
                 Snapshot ss = null;
@@ -86,7 +86,7 @@ public class PaperMapChunkCache113_2 extends MapChunkCache113_2 {
                     inhabitedTicks[idx] = inhabited_ticks;
 
                     endChunkLoad(startTime, ChunkStats.CACHED_SNAPSHOT_HIT);
-                    count.decrementAndGet();
+                    done();
                     return;
                 }
                 boolean wasLoaded = w.isChunkLoaded(chunk.x, chunk.z);
@@ -181,19 +181,7 @@ public class PaperMapChunkCache113_2 extends MapChunkCache113_2 {
                 else {
                     endChunkLoad(startTime, ChunkStats.LOADED_CHUNKS);
                 }
-                if (count.decrementAndGet() != 0) return;
-                DynmapCore.setIgnoreChunkLoads(false);
-
-                if(iterator.hasNext() == false) {   /* If we're done */
-                    isempty = true;
-                    /* Fill missing chunks with empty dummy chunk */
-                    for(int i = 0; i < snaparray.length; i++) {
-                        if(snaparray[i] == null)
-                            snaparray[i] = EMPTY;
-                        else if(snaparray[i] != EMPTY)
-                            isempty = false;
-                    }
-                }
+                done();
             });
             cnt++;
         }
@@ -213,5 +201,21 @@ public class PaperMapChunkCache113_2 extends MapChunkCache113_2 {
     public void unloadChunks() {
         super.unloadChunks();
         count.set(0);
+    }
+
+    private void done() {
+        if (count.decrementAndGet() != 0) return;
+        DynmapCore.setIgnoreChunkLoads(false);
+
+        if(iterator.hasNext() == false) {   /* If we're done */
+            isempty = true;
+            /* Fill missing chunks with empty dummy chunk */
+            for(int i = 0; i < snaparray.length; i++) {
+                if(snaparray[i] == null)
+                    snaparray[i] = EMPTY;
+                else if(snaparray[i] != EMPTY)
+                    isempty = false;
+            }
+        }
     }
 }

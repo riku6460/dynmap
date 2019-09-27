@@ -87,7 +87,7 @@ public class PaperMapChunkCache extends MapChunkCacheClassic {
                     inhabitedTicks[idx] = inhabited_ticks;
 
                     endChunkLoad(startTime, ChunkStats.CACHED_SNAPSHOT_HIT);
-                    count.decrementAndGet();
+                    done();
                     return;
                 }
                 boolean wasLoaded = w.isChunkLoaded(chunk.x, chunk.z);
@@ -182,19 +182,7 @@ public class PaperMapChunkCache extends MapChunkCacheClassic {
                 else {
                     endChunkLoad(startTime, ChunkStats.LOADED_CHUNKS);
                 }
-                if (count.decrementAndGet() != 0) return;
-                DynmapCore.setIgnoreChunkLoads(false);
-
-                if(iterator.hasNext() == false) {   /* If we're done */
-                    isempty = true;
-                    /* Fill missing chunks with empty dummy chunk */
-                    for(int i = 0; i < snaparray.length; i++) {
-                        if(snaparray[i] == null)
-                            snaparray[i] = EMPTY;
-                        else if(snaparray[i] != EMPTY)
-                            isempty = false;
-                    }
-                }
+                done();
             });
             cnt++;
         }
@@ -214,5 +202,21 @@ public class PaperMapChunkCache extends MapChunkCacheClassic {
     public void unloadChunks() {
         super.unloadChunks();
         count.set(0);
+    }
+
+    private void done() {
+        if (count.decrementAndGet() != 0) return;
+        DynmapCore.setIgnoreChunkLoads(false);
+
+        if(iterator.hasNext() == false) {   /* If we're done */
+            isempty = true;
+            /* Fill missing chunks with empty dummy chunk */
+            for(int i = 0; i < snaparray.length; i++) {
+                if(snaparray[i] == null)
+                    snaparray[i] = EMPTY;
+                else if(snaparray[i] != EMPTY)
+                    isempty = false;
+            }
+        }
     }
 }
