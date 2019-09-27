@@ -1,0 +1,9 @@
+
+description = 'paper-helper'
+
+dependencies {
+    compile project(':bukkit-helper')
+    compile project(':dynmap-api')
+    compile project(path: ':DynmapCore', configuration: 'shadow')
+    compile group: 'com.destroystokyo.paper', name: 'paper-api', version:'1.12.2-R0.1-SNAPSHOT'
+}

@@ -6,6 +6,8 @@ include ':bukkit-helper-113-2'
 include ':bukkit-helper-114'
 include ':bukkit-helper-114-1'
 include ':bukkit-helper'
+include ':paper-helper-113-2'
+include ':paper-helper'
 include ':dynmap-api'
 include ':DynmapCore'
 include ':DynmapCoreAPI'
@@ -23,6 +25,8 @@ project(':bukkit-helper-113-2').projectDir = "$rootDir/bukkit-helper-113-2" as F
 project(':bukkit-helper-114').projectDir = "$rootDir/bukkit-helper-114" as File
 project(':bukkit-helper-114-1').projectDir = "$rootDir/bukkit-helper-114-1" as File
 project(':bukkit-helper').projectDir = "$rootDir/bukkit-helper" as File
+project(':paper-helper-113-2').projectDir = "$rootDir/paper-helper-113-2" as File
+project(':paper-helper').projectDir = "$rootDir/paper-helper" as File
 project(':dynmap-api').projectDir = "$rootDir/dynmap-api" as File
 project(':DynmapCore').projectDir = "$rootDir/DynmapCore" as File
 project(':DynmapCoreAPI').projectDir = "$rootDir/DynmapCoreAPI" as File

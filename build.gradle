@@ -14,6 +14,7 @@ allprojects  {
      maven { url "http://repo.maven.apache.org/maven2" }
      maven { url "https://hub.spigotmc.org/nexus/content/repositories/snapshots/" }
      maven { url "http://repo.bstats.org/content/repositories/releases/" }
+     maven { url "https://papermc.io/repo/repository/maven-public/" }
   }
 
   apply plugin: 'java'

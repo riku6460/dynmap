@@ -10,6 +10,8 @@ import org.dynmap.bukkit.helper.v113_1.BukkitVersionHelperSpigot113_1;
 import org.dynmap.bukkit.helper.v113_2.BukkitVersionHelperSpigot113_2;
 import org.dynmap.bukkit.helper.v114.BukkitVersionHelperSpigot114;
 import org.dynmap.bukkit.helper.v114_1.BukkitVersionHelperSpigot114_1;
+import org.dynmap.paper.helper.PaperVersionHelper;
+import org.dynmap.paper.helper.v113_2.PaperVersionHelper113_2;
 
 public class Helper {
     
@@ -44,6 +46,9 @@ public class Helper {
             }
             else if (v.contains("(MC: 1.13.2)")) {
                 BukkitVersionHelper.helper = new BukkitVersionHelperSpigot113_2();
+                if (v.contains("Paper")) {
+                    BukkitVersionHelper.helper = new PaperVersionHelper113_2();
+                }
             }
             else if (v.contains("(MC: 1.13.1)")) {
                 BukkitVersionHelper.helper = new BukkitVersionHelperSpigot113_1();
@@ -53,6 +58,9 @@ public class Helper {
             }
             else {
             	BukkitVersionHelper.helper = new BukkitVersionHelperCB();
+            	if (v.contains("Paper")) {
+            	    BukkitVersionHelper.helper = new PaperVersionHelper();
+                }
             }
         }
         return BukkitVersionHelper.helper;
