@@ -15,7 +15,6 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
-import java.util.StringJoiner;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -279,7 +278,6 @@ public class FileTreeMapStorage extends MapStorage {
 
                         try (OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream())) {
                             writer.write("{\"files\":" + JSONArray.toJSONString(paths) + "}");
-                            writer.flush();
                         }
 
                         connection.connect();
