@@ -673,6 +673,11 @@ public class FileTreeMapStorage extends MapStorage {
                 }
                 else {
                     fnew.renameTo(f);
+                    String path = baseTileDir.toURI().relativize(f.toURI()).getPath();
+                    if (File.separator.equals("\\")) {
+                        path = path.replace("\\", "/");
+                    }
+                    cloudflarePurges.add(path);
                 }
                 done = true;
             } catch (IOException iox) {
