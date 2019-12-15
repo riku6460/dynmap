@@ -32,6 +32,8 @@ import org.dynmap.debug.Debug;
 import org.dynmap.storage.MapStorage;
 import org.dynmap.storage.MapStorageTile;
 import org.dynmap.storage.MapStorageTileEnumCB;
+import org.dynmap.storage.MapStorageBaseTileEnumCB;
+import org.dynmap.storage.MapStorageTileSearchEndCB;
 import org.dynmap.utils.BufferInputStream;
 import org.dynmap.utils.BufferOutputStream;
 import org.json.simple.JSONArray;
@@ -348,9 +350,13 @@ public class FileTreeMapStorage extends MapStorage {
     }
 
 
-    private void processEnumMapTiles(DynmapWorld world, MapType map, File base, ImageVariant var, MapStorageTileEnumCB cb) {
+    private void processEnumMapTiles(DynmapWorld world, MapType map, File base, ImageVariant var, MapStorageTileEnumCB cb, MapStorageBaseTileEnumCB cbBase, MapStorageTileSearchEndCB cbEnd) {
         File bdir = new File(base, map.getPrefix() + var.variantSuffix);
-        if (bdir.isDirectory() == false) return;
+        if (bdir.isDirectory() == false) {
+            if(cbEnd != null)
+                cbEnd.searchEnded();
+            return;
+        }
 
         LinkedList<File> dirs = new LinkedList<File>(); // List to traverse
         dirs.add(bdir);   // Directory for map
@@ -396,13 +402,19 @@ public class FileTreeMapStorage extends MapStorage {
                             int y = Integer.parseInt(coord[1]);
                             // Invoke callback
                             MapStorageTile t = new StorageTile(world, map, x, y, zoom, var);
-                            cb.tileFound(t, fmt);
+                            if(cb != null)
+                                cb.tileFound(t, fmt);
+                            if(cbBase != null && t.zoom == 0)
+                                cbBase.tileFound(t, fmt);
                             t.cleanup();
                         } catch (NumberFormatException nfx) {
                         }
                     }
                 }
             }
+        }
+        if(cbEnd != null) {
+            cbEnd.searchEnded();
         }
     }
 
@@ -420,7 +432,26 @@ public class FileTreeMapStorage extends MapStorage {
         for (MapType mt : mtlist) {
             ImageVariant[] vars = mt.getVariants();
             for (ImageVariant var : vars) {
-                processEnumMapTiles(world, mt, base, var, cb);
+                processEnumMapTiles(world, mt, base, var, cb, null, null);
+            }
+        }
+    }
+
+    @Override
+    public void enumMapBaseTiles(DynmapWorld world, MapType map, MapStorageBaseTileEnumCB cbBase, MapStorageTileSearchEndCB cbEnd) {
+        File base = new File(baseTileDir, world.getName()); // Get base directory for world
+        List<MapType> mtlist;
+
+        if (map != null) {
+            mtlist = Collections.singletonList(map);
+        }
+        else {  // Else, add all directories under world directory (for maps)
+            mtlist = new ArrayList<MapType>(world.maps);
+        }
+        for (MapType mt : mtlist) {
+            ImageVariant[] vars = mt.getVariants();
+            for (ImageVariant var : vars) {
+                processEnumMapTiles(world, mt, base, var, null, cbBase, cbEnd);
             }
         }
     }
