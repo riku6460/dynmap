@@ -21,6 +21,11 @@ public class LuckPermsPermissions implements PermissionProvider {
     LuckPermsApi luckPerms;
 
     public static LuckPermsPermissions create(Server server, String name) {
+        try {
+            Class.forName("me.lucko.luckperms.api.LuckPermsApi");    /* See if class exists */
+        } catch (ClassNotFoundException cnfx) {
+            return null;
+        }
         if (!server.getPluginManager().isPluginEnabled("LuckPerms"))
             return null;
         LuckPermsApi luckPerms = server.getServicesManager().load(LuckPermsApi.class);

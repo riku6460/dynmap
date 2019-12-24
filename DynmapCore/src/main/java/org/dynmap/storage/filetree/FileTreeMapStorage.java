@@ -3,13 +3,23 @@ package org.dynmap.storage.filetree;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.RandomAccessFile;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
+import org.dynmap.ConfigurationNode;
 import org.dynmap.DynmapCore;
 import org.dynmap.DynmapWorld;
 import org.dynmap.Log;
@@ -22,14 +32,18 @@ import org.dynmap.debug.Debug;
 import org.dynmap.storage.MapStorage;
 import org.dynmap.storage.MapStorageTile;
 import org.dynmap.storage.MapStorageTileEnumCB;
+import org.dynmap.storage.MapStorageBaseTileEnumCB;
+import org.dynmap.storage.MapStorageTileSearchEndCB;
 import org.dynmap.utils.BufferInputStream;
 import org.dynmap.utils.BufferOutputStream;
+import org.json.simple.JSONArray;
 
 public class FileTreeMapStorage extends MapStorage {
     private File baseTileDir;
     private TileHashManager hashmap;
     private static final int MAX_WRITE_RETRIES = 6;
     private static final Charset UTF8 = Charset.forName("UTF-8");
+    private final Queue<String> cloudflarePurges = new ConcurrentLinkedQueue<>();
 
     public class StorageTile extends MapStorageTile {
         private final String baseFilename;
@@ -240,6 +254,47 @@ public class FileTreeMapStorage extends MapStorage {
         }
         baseTileDir = core.getTilesFolder();
         hashmap = new TileHashManager(baseTileDir, true);
+
+        ConfigurationNode node = core.configuration.getNode("cloudflare");
+        if (node.getBoolean("enable", false)) {
+            Timer timer = new Timer();
+            TimerTask task = new TimerTask() {
+                @Override
+                public void run() {
+                    int size = cloudflarePurges.size();
+                    if (size <= 0) return;
+
+                    List<String> paths = new ArrayList<>();
+                    for (int i = 0; i < 30 && i < size; i++) {
+                        paths.add(node.get("url") + cloudflarePurges.poll());
+                    }
+
+                    try {
+                        URL url = new URL("https://api.cloudflare.com/client/v4/zones/" + node.getString("zone_id") + "/purge_cache");
+                        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                        connection.setRequestMethod("POST");
+                        connection.addRequestProperty("Content-Type", "application/json");
+                        connection.addRequestProperty("X-Auth-Email", node.getString("email"));
+                        connection.addRequestProperty("X-Auth-Key", node.getString("key"));
+                        connection.setDoOutput(true);
+
+                        try (OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream())) {
+                            writer.write("{\"files\":" + JSONArray.toJSONString(paths) + "}");
+                        }
+
+                        connection.connect();
+
+                        connection.getResponseCode();
+
+                        connection.disconnect();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            };
+            timer.scheduleAtFixedRate(task, 0, 1000);
+        }
+
         return true;
     }
     
@@ -295,9 +350,13 @@ public class FileTreeMapStorage extends MapStorage {
     }
 
 
-    private void processEnumMapTiles(DynmapWorld world, MapType map, File base, ImageVariant var, MapStorageTileEnumCB cb) {
+    private void processEnumMapTiles(DynmapWorld world, MapType map, File base, ImageVariant var, MapStorageTileEnumCB cb, MapStorageBaseTileEnumCB cbBase, MapStorageTileSearchEndCB cbEnd) {
         File bdir = new File(base, map.getPrefix() + var.variantSuffix);
-        if (bdir.isDirectory() == false) return;
+        if (bdir.isDirectory() == false) {
+            if(cbEnd != null)
+                cbEnd.searchEnded();
+            return;
+        }
 
         LinkedList<File> dirs = new LinkedList<File>(); // List to traverse
         dirs.add(bdir);   // Directory for map
@@ -343,13 +402,19 @@ public class FileTreeMapStorage extends MapStorage {
                             int y = Integer.parseInt(coord[1]);
                             // Invoke callback
                             MapStorageTile t = new StorageTile(world, map, x, y, zoom, var);
-                            cb.tileFound(t, fmt);
+                            if(cb != null)
+                                cb.tileFound(t, fmt);
+                            if(cbBase != null && t.zoom == 0)
+                                cbBase.tileFound(t, fmt);
                             t.cleanup();
                         } catch (NumberFormatException nfx) {
                         }
                     }
                 }
             }
+        }
+        if(cbEnd != null) {
+            cbEnd.searchEnded();
         }
     }
 
@@ -367,7 +432,26 @@ public class FileTreeMapStorage extends MapStorage {
         for (MapType mt : mtlist) {
             ImageVariant[] vars = mt.getVariants();
             for (ImageVariant var : vars) {
-                processEnumMapTiles(world, mt, base, var, cb);
+                processEnumMapTiles(world, mt, base, var, cb, null, null);
+            }
+        }
+    }
+
+    @Override
+    public void enumMapBaseTiles(DynmapWorld world, MapType map, MapStorageBaseTileEnumCB cbBase, MapStorageTileSearchEndCB cbEnd) {
+        File base = new File(baseTileDir, world.getName()); // Get base directory for world
+        List<MapType> mtlist;
+
+        if (map != null) {
+            mtlist = Collections.singletonList(map);
+        }
+        else {  // Else, add all directories under world directory (for maps)
+            mtlist = new ArrayList<MapType>(world.maps);
+        }
+        for (MapType mt : mtlist) {
+            ImageVariant[] vars = mt.getVariants();
+            for (ImageVariant var : vars) {
+                processEnumMapTiles(world, mt, base, var, null, cbBase, cbEnd);
             }
         }
     }
@@ -607,10 +691,24 @@ public class FileTreeMapStorage extends MapStorage {
                 if (f.exists()) {
                     f.renameTo(fold);
                     fnew.renameTo(f);
+
+                    if (!Arrays.equals(Files.readAllBytes(f.toPath()), Files.readAllBytes(fold.toPath()))) {
+                        String path = baseTileDir.toURI().relativize(f.toURI()).getPath();
+                        if (File.separator.equals("\\")) {
+                            path = path.replace("\\", "/");
+                        }
+                        cloudflarePurges.add(path);
+                    }
+
                     fold.delete();
                 }
                 else {
                     fnew.renameTo(f);
+                    String path = baseTileDir.toURI().relativize(f.toURI()).getPath();
+                    if (File.separator.equals("\\")) {
+                        path = path.replace("\\", "/");
+                    }
+                    cloudflarePurges.add(path);
                 }
                 done = true;
             } catch (IOException iox) {

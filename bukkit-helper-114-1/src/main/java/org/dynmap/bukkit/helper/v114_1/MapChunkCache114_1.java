@@ -1,7 +1,6 @@
 package org.dynmap.bukkit.helper.v114_1;
 
 import org.bukkit.block.Biome;
-import org.bukkit.craftbukkit.libs.jline.internal.Log;
 import org.bukkit.craftbukkit.v1_14_R1.CraftWorld;
 
 import java.io.IOException;
@@ -86,7 +85,7 @@ public class MapChunkCache114_1 extends AbstractMapChunkCache {
 	        public StdSection() {
 	            states = new DynmapBlockState[BLOCKS_PER_SECTION];
 	            Arrays.fill(states,  DynmapBlockState.AIR);
-	            skylight = emptyData;
+	            skylight = fullData;
 	            emitlight = emptyData;
 	        }
 	        @Override
