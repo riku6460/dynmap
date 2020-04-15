@@ -12,7 +12,7 @@ include ':paper-helper'
 include ':dynmap-api'
 include ':DynmapCore'
 include ':DynmapCoreAPI'
-include ':forge-1.13.2'
+//include ':forge-1.13.2'
 include ':forge-1.12.2'
 include ':forge-1.11.2'
 include ':forge-1.10.2'
@@ -32,7 +32,7 @@ project(':paper-helper').projectDir = "$rootDir/paper-helper" as File
 project(':dynmap-api').projectDir = "$rootDir/dynmap-api" as File
 project(':DynmapCore').projectDir = "$rootDir/DynmapCore" as File
 project(':DynmapCoreAPI').projectDir = "$rootDir/DynmapCoreAPI" as File
-project(':forge-1.13.2').projectDir = "$rootDir/forge-1.13.2" as File
+//project(':forge-1.13.2').projectDir = "$rootDir/forge-1.13.2" as File
 project(':forge-1.12.2').projectDir = "$rootDir/forge-1.12.2" as File
 project(':forge-1.11.2').projectDir = "$rootDir/forge-1.11.2" as File
 project(':forge-1.10.2').projectDir = "$rootDir/forge-1.10.2" as File
