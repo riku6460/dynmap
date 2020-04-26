@@ -239,7 +239,7 @@ public class DynmapPlugin
         	DynmapBlockState bs = DynmapBlockState.getStateByGlobalIndex(gidx);
         	Log.info(gidx + ":" + bs.toString() + ", gidx=" + bs.globalStateIndex + ", sidx=" + bs.stateIndex);
         }
-        DynmapBlockState bstest = DynmapBlockState.getStateByNameAndIndex("minecfraft:white_bed", 0);
+        DynmapBlockState bstest = DynmapBlockState.getStateByNameAndIndex("minecraft:white_bed", 8);
         Log.info("test:" + bstest.toString() + ", gidx=" + bstest.globalStateIndex + ", sidx=" + bstest.stateIndex);
 
     }
