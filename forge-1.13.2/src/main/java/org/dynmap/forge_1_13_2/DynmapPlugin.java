@@ -1012,6 +1012,7 @@ public class DynmapPlugin
         }
         @Override
         public File getModContainerFile(String name) {
+        	Log.info("getModContainferFile(" + name + ")");
         	ModFileInfo mfi = ModList.get().getModFileById(name);    // Try case sensitive lookup
             if (mfi != null) {
             	return mfi.getFile().getFilePath().toFile();
