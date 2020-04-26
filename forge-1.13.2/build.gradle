@@ -1,10 +1,8 @@
 buildscript {
     repositories {
+        maven { url = 'https://files.minecraftforge.net/maven' }
         jcenter()
-        maven {
-            name = "forge"
-            url = "http://files.minecraftforge.net/maven"
-        }
+        mavenCentral()        
         maven {url = "https://oss.sonatype.org/content/repositories/snapshots/"}
     }
     dependencies {
@@ -16,32 +14,21 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 apply plugin: 'com.github.johnrengelman.shadow'
 
-dependencies {
-    compile project(path: ":DynmapCore", configuration: "shadow")
-    minecraft 'net.minecraftforge:forge:1.13.2-25.0.219'
-}
-
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
 ext.buildNumber = System.getenv().BUILD_NUMBER ?: "Dev"
 
-repositories {
-    maven {
-        name = 'forge'
-        url = 'http://files.minecraftforge.net/maven'
-    }
-}
-
 minecraft {
-   mappings channel: 'stable', version: '47-1.13.2'
-   runs {
-        server {
-            workingDirectory project.file('run').canonicalPath
-        }
-    }
+    mappings channel: 'snapshot', version: '20180921-1.13'
 }
 
 project.archivesBaseName = "${project.archivesBaseName}-forge-1.13.2"
+
+dependencies {
+    minecraft 'net.minecraftforge:forge:1.13.2-25.0.219'
+    compile project(path: ":DynmapCore", configuration: "shadow")
+    compile 'com.googlecode.json-simple:json-simple:1.1.1'
+    compile 'org.yaml:snakeyaml:1.23'
+}
 
 processResources
 {

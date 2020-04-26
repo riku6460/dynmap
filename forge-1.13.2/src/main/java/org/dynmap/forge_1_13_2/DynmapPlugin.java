@@ -177,7 +177,7 @@ public class DynmapPlugin
      * Initialize block states (org.dynmap.blockstate.DynmapBlockState)
      */
     public void initializeBlockStates() {
-    	stateByID = new DynmapBlockState[512*16];	// Simple map - scale as needed
+    	stateByID = new DynmapBlockState[512*32];	// Simple map - scale as needed
     	Arrays.fill(stateByID, DynmapBlockState.AIR); // Default to air
 
     	ObjectIntIdentityMap<IBlockState> bsids = Block.BLOCK_STATE_IDS;
@@ -198,15 +198,16 @@ public class DynmapPlugin
             Block b = bs.getBlock();
     		// If this is new block vs last, it's the base block state
     		if (b != baseb) {
-    			basebs = b;
-    			baseidx = idx;
+    			basebs = null;
+                baseidx = idx;
+                baseb = b;
     		}
     		
             ResourceLocation ui = b.getRegistryName();
             if (ui == null) {
             	continue;
             }
-        	String bn = ui.getNamespace() + ":" + ui.getPath();
+            String bn = ui.getNamespace() + ":" + ui.getPath();
             // Only do defined names, and not "air"
             if (!bn.equals(DynmapBlockState.AIR_BLOCK)) {
                 Material mat = bs.getMaterial();
@@ -217,8 +218,10 @@ public class DynmapPlugin
                 	}
                 	statename += p.getName() + "=" + bs.get(p).toString();
                 }
+                Log.info("bn=" + bn + ", statenme=" + statename + ",idx=" + idx + ",baseidx=" + baseidx);
                 DynmapBlockState dbs = new DynmapBlockState(basebs, idx - baseidx, bn, statename, mat.toString(), idx);
                 stateByID[idx] = dbs;
+                if (!basebs) { basebs = dbs; }
                 if (mat.isSolid()) {
                     dbs.setSolid();
                 }
@@ -237,6 +240,9 @@ public class DynmapPlugin
         	DynmapBlockState bs = DynmapBlockState.getStateByGlobalIndex(gidx);
         	Log.info(gidx + ":" + bs.toString() + ", gidx=" + bs.globalStateIndex + ", sidx=" + bs.stateIndex);
         }
+        DynmapBlockState bstest = DynmapBlockState.getStateByNameAndIndex("minecraft:white_bed", 8);
+        Log.info("test:" + bstest.toString() + ", gidx=" + bstest.globalStateIndex + ", sidx=" + bstest.stateIndex);
+
     }
 
     public static final Item getItemByID(int id) {
