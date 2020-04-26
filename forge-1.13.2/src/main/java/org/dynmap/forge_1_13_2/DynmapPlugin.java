@@ -207,7 +207,7 @@ public class DynmapPlugin
             if (ui == null) {
             	continue;
             }
-        	String bn = ui.getNamespace() + ":" + ui.getPath();
+            String bn = ui.getNamespace() + ":" + ui.getPath();
             // Only do defined names, and not "air"
             if (!bn.equals(DynmapBlockState.AIR_BLOCK)) {
                 Material mat = bs.getMaterial();
@@ -218,6 +218,7 @@ public class DynmapPlugin
                 	}
                 	statename += p.getName() + "=" + bs.get(p).toString();
                 }
+                Log.info("bn=" + bn + ", statenme=" + statename);
                 DynmapBlockState dbs = new DynmapBlockState(basebs, idx - baseidx, bn, statename, mat.toString(), idx);
                 stateByID[idx] = dbs;
                 if (mat.isSolid()) {
