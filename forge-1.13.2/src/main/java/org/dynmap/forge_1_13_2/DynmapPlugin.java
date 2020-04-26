@@ -177,7 +177,7 @@ public class DynmapPlugin
      * Initialize block states (org.dynmap.blockstate.DynmapBlockState)
      */
     public void initializeBlockStates() {
-    	stateByID = new DynmapBlockState[512*16];	// Simple map - scale as needed
+    	stateByID = new DynmapBlockState[512*32];	// Simple map - scale as needed
     	Arrays.fill(stateByID, DynmapBlockState.AIR); // Default to air
 
     	ObjectIntIdentityMap<IBlockState> bsids = Block.BLOCK_STATE_IDS;
