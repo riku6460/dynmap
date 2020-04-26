@@ -221,7 +221,7 @@ public class DynmapPlugin
                 Log.info("bn=" + bn + ", statenme=" + statename + ",idx=" + idx + ",baseidx=" + baseidx);
                 DynmapBlockState dbs = new DynmapBlockState(basebs, idx - baseidx, bn, statename, mat.toString(), idx);
                 stateByID[idx] = dbs;
-                if (!basebs) { basebs = dbs; }
+                if (basebs == null) { basebs = dbs; }
                 if (mat.isSolid()) {
                     dbs.setSolid();
                 }
