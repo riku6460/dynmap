@@ -218,7 +218,7 @@ public class DynmapPlugin
                 	}
                 	statename += p.getName() + "=" + bs.get(p).toString();
                 }
-                Log.info("bn=" + bn + ", statenme=" + statename + ",idx=" + idx + ",baseidx=" + baseidx);
+                //Log.info("bn=" + bn + ", statenme=" + statename + ",idx=" + idx + ",baseidx=" + baseidx);
                 DynmapBlockState dbs = new DynmapBlockState(basebs, idx - baseidx, bn, statename, mat.toString(), idx);
                 stateByID[idx] = dbs;
                 if (basebs == null) { basebs = dbs; }
@@ -238,11 +238,8 @@ public class DynmapPlugin
     	}
         for (int gidx = 0; gidx < DynmapBlockState.getGlobalIndexMax(); gidx++) {
         	DynmapBlockState bs = DynmapBlockState.getStateByGlobalIndex(gidx);
-        	Log.info(gidx + ":" + bs.toString() + ", gidx=" + bs.globalStateIndex + ", sidx=" + bs.stateIndex);
+        	//Log.info(gidx + ":" + bs.toString() + ", gidx=" + bs.globalStateIndex + ", sidx=" + bs.stateIndex);
         }
-        DynmapBlockState bstest = DynmapBlockState.getStateByNameAndIndex("minecraft:white_bed", 8);
-        Log.info("test:" + bstest.toString() + ", gidx=" + bstest.globalStateIndex + ", sidx=" + bstest.stateIndex);
-
     }
 
     public static final Item getItemByID(int id) {
