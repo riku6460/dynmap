@@ -198,8 +198,9 @@ public class DynmapPlugin
             Block b = bs.getBlock();
     		// If this is new block vs last, it's the base block state
     		if (b != baseb) {
-    			basebs = b;
-    			baseidx = idx;
+    			basebs = null;
+                baseidx = idx;
+                baseb = b;
     		}
     		
             ResourceLocation ui = b.getRegistryName();
