@@ -30,7 +30,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -104,6 +103,7 @@ public class DynmapCore implements DynmapCommonAPI {
     public ComponentManager componentManager = new ComponentManager();
     public DynmapListenerManager listenerManager = new DynmapListenerManager(this);
     public PlayerFaces playerfacemgr;
+    public SkinUrlProvider skinUrlProvider;
     public Events events = new Events();
     public String deftemplatesuffix = "";
     private DynmapMapCommands dmapcmds = new DynmapMapCommands();
@@ -154,6 +154,10 @@ public class DynmapCore implements DynmapCommonAPI {
 
     /* Constructor for core */
     public DynmapCore() {
+    }
+
+    public void setSkinUrlProvider(SkinUrlProvider skinUrlProvider) {
+        this.skinUrlProvider = skinUrlProvider;
     }
     
     /* Cleanup method */
@@ -552,8 +556,9 @@ public class DynmapCore implements DynmapCommonAPI {
         
         /* Print version info */
         Log.info("version " + plugin_ver + " is enabled - core version " + version );
-        Log.info("For support, visit https://forums.dynmap.us");
+        Log.info("For support, visit https://reddit.com/r/Dynmap");
         Log.info("To report or track bugs, visit https://github.com/webbukkit/dynmap/issues");
+        Log.info("If you'd like to donate, please visit https://www.patreon.com/dynmap or https://ko-fi.com/michaelprimm");
 
         events.<Object>trigger("initialized", null);
                 
@@ -563,7 +568,20 @@ public class DynmapCore implements DynmapCommonAPI {
         //dumpColorMap("dokuhigh.txt", "dokuhigh.zip");
         //dumpColorMap("misa.txt", "misa.zip");
         //dumpColorMap("sphax.txt", "sphax.zip");
-        
+
+//        Log.info("Block Name dump");
+//        Log.info("---------------");
+//        for (int i = 0; i < DynmapBlockState.getGlobalIndexMax(); ) {
+//        	DynmapBlockState bs = DynmapBlockState.getStateByGlobalIndex(i);
+//        	if (bs != null) {
+//        		Log.info(String.format("%d,%s,%d", i, bs.blockName, bs.getStateCount()));
+//        		i += bs.getStateCount();
+//        	}
+//        	else {
+//        		i++;
+//        	}
+//        }
+//        Log.info("---------------");
         return true;
     }
     
@@ -2288,8 +2306,9 @@ public class DynmapCore implements DynmapCommonAPI {
         else {  // First time, delete old external texture pack
             deleteDirectory(new File(df, "texturepacks/standard"));
         }
+        String curver = this.getDynmapCoreVersion();
         /* If matched, we're good */
-        if (prevver.equals(this.getDynmapCoreVersion())) {
+        if (prevver.equals(curver) && (!curver.endsWith(("-Dev")))) {
             return;
         }
         /* Get deleted file list */

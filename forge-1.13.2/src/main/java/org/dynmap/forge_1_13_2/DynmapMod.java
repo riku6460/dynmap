@@ -2,7 +2,7 @@ package org.dynmap.forge_1_13_2;
 
 import java.io.File;
 
-import org.dynmap.DynmapCommonAPI; 
+import org.dynmap.DynmapCommonAPI;
 import org.dynmap.DynmapCommonAPIListener;
 import org.dynmap.Log;
 import org.dynmap.forge_1_13_2.DynmapPlugin.OurLog;
@@ -12,6 +12,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
@@ -30,6 +31,7 @@ public class DynmapMod
     
     public static DynmapPlugin plugin;
     public static File jarfile;
+    public static String ver;
     public static boolean useforcedchunks;
 
     public class APICallback extends DynmapCommonAPIListener {
@@ -71,7 +73,10 @@ public class DynmapMod
     public void setup(final FMLCommonSetupEvent event)
     {
     	//TOOO
-        //jarfile = event.getSourceFile();
+        jarfile = ModList.get().getModFileById("dynmap").getFile().getFilePath().toFile();
+
+        ver = ModList.get().getModContainerById("dynmap").get().getModInfo().getVersion().toString();
+
         //// Load configuration file - use suggested (config/WesterosBlocks.cfg)
         //Configuration cfg = new Configuration(event.getSuggestedConfigurationFile());
         //try {
@@ -102,13 +107,14 @@ public class DynmapMod
     @SubscribeEvent
     public void onServerStarting(FMLServerStartingEvent event) {
         server = event.getServer();
-    }
+        if(plugin == null)
+            plugin = proxy.startServer(server);
+		plugin.onStarting(event.getCommandDispatcher());
+	}
     
     @SubscribeEvent
     public void onServerStarted(FMLServerStartedEvent event) {
         DynmapCommonAPIListener.register(new APICallback()); 
-        if(plugin == null)
-            plugin = proxy.startServer(server);
         plugin.serverStarted();
     }
 
