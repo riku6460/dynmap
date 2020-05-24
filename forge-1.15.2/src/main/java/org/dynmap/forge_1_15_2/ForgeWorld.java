@@ -1,4 +1,4 @@
-package org.dynmap.forge_1_14_4;
+package org.dynmap.forge_1_15_2;
 /**
  * Forge specific implementation of DynmapWorld
  */
@@ -169,9 +169,8 @@ public class ForgeWorld extends DynmapWorld
     	world = w;
     	this.sealevel = w.getSeaLevel();   // Read actual current sealevel from world
     	// Update lighting table
-    	float[] lt = w.getDimension().getLightBrightnessTable();
     	for (int i = 0; i < 16; i++) {
-    	    this.setBrightnessTableEntry(i, lt[i]);
+    	    this.setBrightnessTableEntry(i, w.getDimension().getLightBrightness(i));
     	}
     }
     /* Get light level of block */
@@ -188,7 +187,7 @@ public class ForgeWorld extends DynmapWorld
     public int getHighestBlockYAt(int x, int z)
     {
     	if(world != null) {
-            return world.getWorld().getChunk(x >> 4, z >> 4).func_217303_b(Type.MOTION_BLOCKING).getHeight(x & 15, z & 15);
+            return world.getWorld().getChunk(x >> 4, z >> 4).getHeightmap(Type.MOTION_BLOCKING).getHeight(x & 15, z & 15);
     	}
     	else
     		return -1;

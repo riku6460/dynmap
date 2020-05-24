@@ -17,7 +17,7 @@ sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = co
 ext.buildNumber = System.getenv().BUILD_NUMBER ?: "Dev"
 
 minecraft {
-    mappings channel: 'snapshot', version: '20190719-1.14.3'
+    mappings channel: 'snapshot', version: '20200514-1.15.1'
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
     runs {
         server {
@@ -26,11 +26,11 @@ minecraft {
     }
 }
 
-project.archivesBaseName = "${project.archivesBaseName}-forge-1.14.4"
+project.archivesBaseName = "${project.archivesBaseName}-forge-1.15.2"
 
 dependencies {
     compile project(path: ":DynmapCore", configuration: "shadow")
-    minecraft 'net.minecraftforge:forge:1.14.4-28.2.10'
+    minecraft 'net.minecraftforge:forge:1.15.2-31.2.3'
 }
 
 processResources
@@ -44,7 +44,7 @@ processResources
         // replace version and mcversion
         expand(
         	version: project.version + '-' + project.ext.buildNumber,
-        	mcversion: "1.14.4"
+        	mcversion: "1.15.2"
     	)
     }
         
@@ -58,7 +58,7 @@ shadowJar {
     dependencies {
         include(dependency(':DynmapCore'))
     }
-    archiveName = "Dynmap-${parent.version}-forge-1.14.4.jar"
+    archiveName = "Dynmap-${parent.version}-forge-1.15.2.jar"
     destinationDir = file '../target'
     manifest {
         attributes 'FMLAT': 'dynmap_at.cfg'

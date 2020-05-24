@@ -1,4 +1,4 @@
-package org.dynmap.forge_1_14_4;
+package org.dynmap.forge_1_15_2;
 
 import java.io.DataInputStream;
 import java.lang.reflect.Field;
@@ -41,7 +41,7 @@ import org.dynmap.DynmapCore;
 import org.dynmap.DynmapWorld;
 import org.dynmap.Log;
 import org.dynmap.common.BiomeMap;
-import org.dynmap.forge_1_14_4.SnapshotCache.SnapshotRec;
+import org.dynmap.forge_1_15_2.SnapshotCache.SnapshotRec;
 import org.dynmap.hdmap.HDBlockModels;
 import org.dynmap.renderer.DynmapBlockState;
 import org.dynmap.renderer.RenderPatchFactory;

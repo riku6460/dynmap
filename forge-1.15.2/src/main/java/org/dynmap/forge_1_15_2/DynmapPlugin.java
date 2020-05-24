@@ -1,4 +1,4 @@
-package org.dynmap.forge_1_14_4;
+package org.dynmap.forge_1_15_2;
 
 import java.io.File;
 import java.io.InputStream;
@@ -49,6 +49,7 @@ import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
@@ -103,13 +104,13 @@ import org.dynmap.common.DynmapPlayer;
 import org.dynmap.common.DynmapServerInterface;
 import org.dynmap.common.DynmapListenerManager.EventType;
 import org.dynmap.debug.Debug;
-import org.dynmap.forge_1_14_4.DmapCommand;
-import org.dynmap.forge_1_14_4.DmarkerCommand;
-import org.dynmap.forge_1_14_4.DynmapCommand;
-import org.dynmap.forge_1_14_4.DynmapMod;
-import org.dynmap.forge_1_14_4.permissions.FilePermissions;
-import org.dynmap.forge_1_14_4.permissions.OpPermissions;
-import org.dynmap.forge_1_14_4.permissions.PermissionProvider;
+import org.dynmap.forge_1_15_2.DmapCommand;
+import org.dynmap.forge_1_15_2.DmarkerCommand;
+import org.dynmap.forge_1_15_2.DynmapCommand;
+import org.dynmap.forge_1_15_2.DynmapMod;
+import org.dynmap.forge_1_15_2.permissions.FilePermissions;
+import org.dynmap.forge_1_15_2.permissions.OpPermissions;
+import org.dynmap.forge_1_15_2.permissions.PermissionProvider;
 import org.dynmap.permissions.PermissionsHandler;
 import org.dynmap.renderer.DynmapBlockState;
 import org.dynmap.utils.DynIntHashMap;
@@ -1183,12 +1184,11 @@ public class DynmapPlugin
         @Override
         public DynmapLocation getLocation()
         {
-            if (player == null)
-            {
+            if (player == null) {
                 return null;
             }
-
-            return toLoc(player.world, player.posX, player.posY, player.posZ);
+            Vec3d v = player.getPositionVector();
+            return toLoc(player.world, v.x, v.y, v.z);
         }
         @Override
         public String getWorld()
@@ -1797,7 +1797,7 @@ public class DynmapPlugin
             for (ServerWorld world : server.getWorlds()) {
             	ForgeWorld fw = getWorld(world);
             	if (fw == null) continue;
-            	Long2ObjectLinkedOpenHashMap<ChunkHolder> chunks = world.getChunkProvider().chunkManager.field_219252_f.clone();
+            	Long2ObjectLinkedOpenHashMap<ChunkHolder> chunks = world.getChunkProvider().chunkManager.immutableLoadedChunks;
             	for (Entry<Long, ChunkHolder> k : chunks.long2ObjectEntrySet()) {
             		long key = k.getKey().longValue();
             		ChunkHolder ch = k.getValue();
