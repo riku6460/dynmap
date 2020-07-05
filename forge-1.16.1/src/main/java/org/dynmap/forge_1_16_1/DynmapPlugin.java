@@ -1,4 +1,4 @@
-package org.dynmap.forge_1_15_2;
+package org.dynmap.forge_1_16_1;
 
 import java.io.File;
 import java.io.InputStream;
@@ -49,10 +49,12 @@ import net.minecraft.util.ObjectIntIdentityMap;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.registry.Registry;
+import net.minecraft.util.text.ChatType;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.IBlockReader;
@@ -106,13 +108,13 @@ import org.dynmap.common.DynmapPlayer;
 import org.dynmap.common.DynmapServerInterface;
 import org.dynmap.common.DynmapListenerManager.EventType;
 import org.dynmap.debug.Debug;
-import org.dynmap.forge_1_15_2.DmapCommand;
-import org.dynmap.forge_1_15_2.DmarkerCommand;
-import org.dynmap.forge_1_15_2.DynmapCommand;
-import org.dynmap.forge_1_15_2.DynmapMod;
-import org.dynmap.forge_1_15_2.permissions.FilePermissions;
-import org.dynmap.forge_1_15_2.permissions.OpPermissions;
-import org.dynmap.forge_1_15_2.permissions.PermissionProvider;
+import org.dynmap.forge_1_16_1.DmapCommand;
+import org.dynmap.forge_1_16_1.DmarkerCommand;
+import org.dynmap.forge_1_16_1.DynmapCommand;
+import org.dynmap.forge_1_16_1.DynmapMod;
+import org.dynmap.forge_1_16_1.permissions.FilePermissions;
+import org.dynmap.forge_1_16_1.permissions.OpPermissions;
+import org.dynmap.forge_1_16_1.permissions.PermissionProvider;
 import org.dynmap.permissions.PermissionsHandler;
 import org.dynmap.renderer.DynmapBlockState;
 import org.dynmap.utils.DynIntHashMap;
@@ -135,7 +137,6 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import it.unimi.dsi.fastutil.longs.LongSortedSet;
-import net.minecraft.state.IProperty;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
@@ -248,7 +249,7 @@ public class DynmapPlugin
             if (!bn.equals(DynmapBlockState.AIR_BLOCK)) {
                 Material mat = bs.getMaterial();
                 String statename = "";
-                for(IProperty p : bs.getProperties()) {
+                for(net.minecraft.state.Property<?> p : bs.func_235904_r_()) {
                 	if (statename.length() > 0) {
                 		statename += ",";
                 	}
@@ -283,10 +284,6 @@ public class DynmapPlugin
 
     public static final Item getItemByID(int id) {
         return Item.getItemById(id);
-    }
-    
-    public static final String getBlockUnlocalizedName(Block b) {
-    	return b.getNameTextComponent().getString();
     }
     
     private static Biome[] biomelist = null;
@@ -767,7 +764,7 @@ public class DynmapPlugin
         public void broadcastMessage(String msg)
         {
             ITextComponent component = new StringTextComponent(msg);
-            server.getPlayerList().sendMessage(component);
+            server.getPlayerList().func_232641_a_(component, ChatType.SYSTEM, Util.field_240973_b_);
             Log.info(stripChatColor(msg));
         }
         @Override
@@ -1192,7 +1189,7 @@ public class DynmapPlugin
             if (player == null) {
                 return null;
             }
-            Vec3d v = player.getPositionVector();
+            Vector3d v = player.getPositionVec();
             return toLoc(player.world, v.x, v.y, v.z);
         }
         @Override
@@ -1291,7 +1288,7 @@ public class DynmapPlugin
         public void sendMessage(String msg)
         {
             ITextComponent ichatcomponent = new StringTextComponent(msg);
-            player.sendMessage(ichatcomponent);
+            server.getPlayerList().func_232641_a_(ichatcomponent, ChatType.CHAT, player.getUniqueID());
         }
         @Override
         public boolean isInvisible() {
@@ -1407,7 +1404,7 @@ public class DynmapPlugin
             if(bb != null) {
                 String id = bb.getRegistryName().getPath();
                 float tmp = bb.getDefaultTemperature(), hum = bb.getDownfall();
-                int watermult = bb.getWaterColor();
+                int watermult = bb.func_235089_q_().field_235206_c_;
                 Log.verboseinfo("biome[" + i + "]: hum=" + hum + ", tmp=" + tmp + ", mult=" + Integer.toHexString(watermult));
 
                 BiomeMap bmap = BiomeMap.byBiomeID(i);
@@ -1488,7 +1485,7 @@ public class DynmapPlugin
         // Extract default permission example, if needed
         File filepermexample = new File(core.getDataFolder(), "permissions.yml.example");
         core.createDefaultFileFromResource("/permissions.yml.example", filepermexample);
-        
+
         DynmapCommonAPIListener.apiInitialized(core);
     }
     
@@ -1905,7 +1902,6 @@ public class DynmapPlugin
         File f = new File(core.getDataFolder(), "forgeworlds.yml");
         if(f.canRead() == false) {
             useSaveFolder = true;
-            ForgeWorld.setSaveFolderMapping();
             return;
         }
         ConfigurationNode cn = new ConfigurationNode(f);
@@ -1916,9 +1912,6 @@ public class DynmapPlugin
         // If setting defined, use it 
         if (cn.containsKey("useSaveFolderAsName")) {
             useSaveFolder = cn.getBoolean("useSaveFolderAsName", useSaveFolder);
-        }
-    	if (useSaveFolder) {
-            ForgeWorld.setSaveFolderMapping();
         }
         List<Map<String,Object>> lst = cn.getMapList("worlds");
         if(lst == null) {
