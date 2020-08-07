@@ -89,6 +89,7 @@ import org.dynmap.bukkit.permissions.PEXPermissions;
 import org.dynmap.bukkit.permissions.PermBukkitPermissions;
 import org.dynmap.bukkit.permissions.GroupManagerPermissions;
 import org.dynmap.bukkit.permissions.PermissionProvider;
+import org.dynmap.bukkit.permissions.VaultPermissions;
 import org.dynmap.bukkit.permissions.bPermPermissions;
 import org.dynmap.bukkit.permissions.LuckPermsPermissions;
 import org.dynmap.bukkit.permissions.LuckPerms5Permissions;
@@ -104,6 +105,7 @@ import org.dynmap.renderer.DynmapBlockState;
 import org.dynmap.utils.MapChunkCache;
 import org.dynmap.utils.Polygon;
 import org.dynmap.utils.VisibilityLimit;
+import skinsrestorer.bukkit.SkinsRestorer;
 
 public class DynmapPlugin extends JavaPlugin implements DynmapAPI {
     private DynmapCore core;
@@ -718,6 +720,15 @@ public class DynmapPlugin extends JavaPlugin implements DynmapAPI {
         public UUID getUUID() {
         	return uuid;
         }
+        /**
+         * Send title and subtitle text (called from server thread)
+         */
+        @Override
+        public void sendTitleText(String title, String subtitle, int fadeInTicks, int stayTicks, int fadeOutTIcks) {
+        	if (player != null) {
+        		helper.sendTitleText(player, title, subtitle, fadeInTicks, stayTicks, fadeOutTIcks);
+        	}
+    	}
     }
     /* Handler for generic console command sender */
     public class BukkitCommandSender implements DynmapCommandSender {
@@ -854,6 +865,7 @@ public class DynmapPlugin extends JavaPlugin implements DynmapAPI {
             perdefs.put(p.getName(), p.getDefault() == PermissionDefault.TRUE);
         }
         
+
         permissions = PEXPermissions.create(getServer(), "dynmap");
         if (permissions == null)
             permissions = bPermPermissions.create(getServer(), "dynmap", perdefs);
@@ -867,6 +879,8 @@ public class DynmapPlugin extends JavaPlugin implements DynmapAPI {
             permissions = LuckPermsPermissions.create(getServer(), "dynmap");
         if (permissions == null)
             permissions = LuckPerms5Permissions.create(getServer(), "dynmap");
+        if (permissions == null)
+            permissions = VaultPermissions.create(this, "dynmap");
         if (permissions == null)
             permissions = BukkitPermissions.create("dynmap", perdefs);
         if (permissions == null)
@@ -892,6 +906,23 @@ public class DynmapPlugin extends JavaPlugin implements DynmapAPI {
             this.setEnabled(false);
             return;
         }
+
+        /* Skins support via SkinsRestorer */
+        SkinsRestorerSkinUrlProvider skinUrlProvider = null;
+
+        if (core.configuration.getBoolean("skinsrestorer-integration", false)) {
+            SkinsRestorer skinsRestorer = (SkinsRestorer) getServer().getPluginManager().getPlugin("SkinsRestorer");
+
+            if (skinsRestorer == null) {
+                Log.warning("SkinsRestorer integration can't be enabled because SkinsRestorer not installed");
+            } else {
+                skinUrlProvider = new SkinsRestorerSkinUrlProvider(skinsRestorer);
+                Log.info("SkinsRestorer integration enabled");
+            }
+        }
+
+        core.setSkinUrlProvider(skinUrlProvider);
+
         /* See if we need to wait before enabling core */
         if(!readyToEnable()) {
             Listener pl = new Listener() {

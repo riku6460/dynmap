@@ -30,7 +30,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -49,10 +48,7 @@ import org.dynmap.markers.MarkerAPI;
 import org.dynmap.markers.impl.MarkerAPIImpl;
 import org.dynmap.modsupport.ModSupportImpl;
 import org.dynmap.renderer.DynmapBlockState;
-import org.dynmap.servlet.FileResourceHandler;
-import org.dynmap.servlet.JettyNullLogger;
-import org.dynmap.servlet.LoginServlet;
-import org.dynmap.servlet.MapStorageResourceHandler;
+import org.dynmap.servlet.*;
 import org.dynmap.storage.MapStorage;
 import org.dynmap.storage.filetree.FileTreeMapStorage;
 import org.dynmap.storage.mysql.MySQLMapStorage;
@@ -107,6 +103,7 @@ public class DynmapCore implements DynmapCommonAPI {
     public ComponentManager componentManager = new ComponentManager();
     public DynmapListenerManager listenerManager = new DynmapListenerManager(this);
     public PlayerFaces playerfacemgr;
+    public SkinUrlProvider skinUrlProvider;
     public Events events = new Events();
     public String deftemplatesuffix = "";
     private DynmapMapCommands dmapcmds = new DynmapMapCommands();
@@ -157,6 +154,10 @@ public class DynmapCore implements DynmapCommonAPI {
 
     /* Constructor for core */
     public DynmapCore() {
+    }
+
+    public void setSkinUrlProvider(SkinUrlProvider skinUrlProvider) {
+        this.skinUrlProvider = skinUrlProvider;
     }
     
     /* Cleanup method */
@@ -507,6 +508,10 @@ public class DynmapCore implements DynmapCommonAPI {
         mapManager = new MapManager(this, configuration);
         mapManager.startRendering();
 
+        if (markerapi != null) {
+        	MarkerAPIImpl.completeInitializeMarkerAPI(markerapi);
+        }
+        
         playerfacemgr = new PlayerFaces(this);
         
         updateConfigHashcode(); /* Initialize/update config hashcode */
@@ -555,8 +560,9 @@ public class DynmapCore implements DynmapCommonAPI {
         
         /* Print version info */
         Log.info("version " + plugin_ver + " is enabled - core version " + version );
-        Log.info("For support, visit https://forums.dynmap.us");
+        Log.info("For support, visit https://reddit.com/r/Dynmap or our Discord at https://discord.gg/s3rd5qn");
         Log.info("To report or track bugs, visit https://github.com/webbukkit/dynmap/issues");
+        Log.info("If you'd like to donate, please visit https://www.patreon.com/dynmap or https://ko-fi.com/michaelprimm");
 
         events.<Object>trigger("initialized", null);
                 
@@ -566,7 +572,33 @@ public class DynmapCore implements DynmapCommonAPI {
         //dumpColorMap("dokuhigh.txt", "dokuhigh.zip");
         //dumpColorMap("misa.txt", "misa.zip");
         //dumpColorMap("sphax.txt", "sphax.zip");
-        
+
+        if (configuration.getBoolean("dumpBlockState", false)) {
+        	Log.info("Block State Dump");
+        	Log.info("----------------");
+        	for (int i = 0; i < DynmapBlockState.getGlobalIndexMax(); i++) {
+        		DynmapBlockState bs = DynmapBlockState.getStateByGlobalIndex(i);
+        		if (bs != null) {
+        			Log.info(String.format("%d: %s", i, bs.toString()));
+        		}
+        	}
+        	Log.info("----------------");
+        }
+        if (configuration.getBoolean("dumpBlockNames", false)) {
+        	Log.info("Block Name dump");
+        	Log.info("---------------");
+        	for (int i = 0; i < DynmapBlockState.getGlobalIndexMax(); ) {
+    			DynmapBlockState bs = DynmapBlockState.getStateByGlobalIndex(i);
+    			if (bs != null) {
+    				Log.info(String.format("%d,%s,%d", i, bs.blockName, bs.getStateCount()));
+    				i += bs.getStateCount();
+    			}
+    			else {
+    				i++;
+    			}
+        	}
+        	Log.info("---------------");
+        }
         return true;
     }
     
@@ -843,12 +875,15 @@ public class DynmapCore implements DynmapCommonAPI {
         filters.add(new CustomHeaderFilter(configuration.getNode("http-response-headers")));
 
         FilterHandler fh = new FilterHandler(router, filters);
+        ContextHandler contextHandler = new ContextHandler();
+        contextHandler.setContextPath("/");
+        contextHandler.setHandler(fh);
         HandlerList hlist = new HandlerList();
-        hlist.setHandlers(new org.eclipse.jetty.server.Handler[] { new SessionHandler(), fh });
+        hlist.setHandlers(new org.eclipse.jetty.server.Handler[] { new SessionHandler(), contextHandler });
         webServer.setHandler(hlist);
         
-        addServlet("/up/configuration", new org.dynmap.servlet.ClientConfigurationServlet(this));
-        addServlet("/standalone/config.js", new org.dynmap.servlet.ConfigJSServlet(this));
+        addServlet("/up/configuration", new ClientConfigurationServlet(this));
+        addServlet("/standalone/config.js", new ConfigJSServlet(this));
         if(authmgr != null) {
             LoginServlet login = new LoginServlet(this);
             addServlet("/up/login", login);
@@ -1155,6 +1190,12 @@ public class DynmapCore implements DynmapCommonAPI {
         new CommandInfo("dmap", "mapset", "<world>:<map> <attrib>:<value> <attrib>:<value>", "Update map <map> of world <world> with new attribute values."),
         new CommandInfo("dmap", "worldreset", "<world>", "Reset world <world> to default template for world type"),
         new CommandInfo("dmap", "worldreset", "<world> <templatename>", "Reset world <world> to temaplte <templatename>."),
+        new CommandInfo("dmap", "worldgetlimits", "<world>", "List visibity and hidden limits for world"),
+        new CommandInfo("dmap", "worldaddlimit", "<world> corner1:<x>/<z> corner2:<x>/<z>", "Add rectangular visibilty limit"),
+        new CommandInfo("dmap", "worldaddlimit", "<world> type:round center:<x>/<z> radius:<radius>", "Add round visibilty limit"),
+        new CommandInfo("dmap", "worldaddlimit", "<world> limittype:hidden corner1:<x>/<z> corner2:<x>/<z>", "Add rectangular hidden limit"),
+        new CommandInfo("dmap", "worldaddlimit", "<world> limittype:hidden hitype:round center:<x>/<z> radius:<radius>", "Add round hidden limit"),
+        new CommandInfo("dmap", "worldremovelimit", "<world> <limit-index>", "Remove world limit with index limit-index"),        
         new CommandInfo("dynmapexp", "", "Set and execute exports in OBJ format."),
         new CommandInfo("dynmapexp", "set", "<attrib> <value> ...", "Set bounds attributes for OBJ export."),
         new CommandInfo("dynmapexp", "reset", "Reset all bounds for OBJ export."),
@@ -2288,8 +2329,9 @@ public class DynmapCore implements DynmapCommonAPI {
         else {  // First time, delete old external texture pack
             deleteDirectory(new File(df, "texturepacks/standard"));
         }
+        String curver = this.getDynmapCoreVersion();
         /* If matched, we're good */
-        if (prevver.equals(this.getDynmapCoreVersion())) {
+        if (prevver.equals(curver) && (!curver.endsWith(("-Dev")))) {
             return;
         }
         /* Get deleted file list */
