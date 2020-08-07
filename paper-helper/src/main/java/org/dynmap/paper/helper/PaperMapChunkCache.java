@@ -3,7 +3,6 @@ package org.dynmap.paper.helper;
 import org.bukkit.ChunkSnapshot;
 import org.dynmap.DynmapChunk;
 import org.dynmap.DynmapCore;
-import org.dynmap.bukkit.helper.AbstractMapChunkCache;
 import org.dynmap.bukkit.helper.BukkitVersionHelper;
 import org.dynmap.bukkit.helper.MapChunkCacheClassic;
 import org.dynmap.bukkit.helper.SnapshotCache;
@@ -18,7 +17,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class PaperMapChunkCache extends MapChunkCacheClassic {
 
-    private AtomicInteger count = new AtomicInteger();
+    private final AtomicInteger count = new AtomicInteger();
 
     @Override
     public int loadChunks(int max_to_load) {

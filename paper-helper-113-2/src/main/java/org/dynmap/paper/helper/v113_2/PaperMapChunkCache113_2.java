@@ -17,7 +17,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class PaperMapChunkCache113_2 extends MapChunkCache113_2 {
 
-    private AtomicInteger count = new AtomicInteger();
+    private final AtomicInteger count = new AtomicInteger();
 
     @Override
     public int loadChunks(int max_to_load) {
