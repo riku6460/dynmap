@@ -1,4 +1,4 @@
-package org.dynmap.forge_1_15_2;
+package org.dynmap.forge_1_16_2;
 
 import java.io.File;
 
@@ -6,8 +6,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.dynmap.DynmapCommonAPI;
 import org.dynmap.DynmapCommonAPIListener;
 import org.dynmap.Log;
-import org.dynmap.forge_1_15_2.DynmapPlugin.OurLog;
-
+import org.dynmap.forge_1_16_2.DynmapPlugin.OurLog;
 
 import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.fml.common.Mod;
@@ -72,7 +71,7 @@ public class DynmapMod
         MinecraftForge.EVENT_BUS.register(this);
 
         ModLoadingContext.get().registerExtensionPoint(ExtensionPoint.DISPLAYTEST, () -> Pair.of(() -> FMLNetworkConstants.IGNORESERVERONLY, (a, b) -> true));
-        
+
         Log.setLogger(new OurLog());      
         org.dynmap.modsupport.ModSupportImpl.init();
     }
@@ -116,7 +115,7 @@ public class DynmapMod
         server = event.getServer();
         if(plugin == null)
             plugin = proxy.startServer(server);
-		plugin.onStarting(event.getCommandDispatcher());
+		plugin.onStarting(server.getCommandManager().getDispatcher());
 	}
     
     @SubscribeEvent

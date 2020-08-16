@@ -1,4 +1,4 @@
-package org.dynmap.forge_1_15_2;
+package org.dynmap.forge_1_16_2;
 
 import java.io.File;
 import java.io.InputStream;
@@ -49,13 +49,16 @@ import net.minecraft.util.ObjectIntIdentityMap;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.registry.Registry;
+import net.minecraft.util.text.ChatType;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.IBlockReader;
+import net.minecraft.world.IServerWorld;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
@@ -106,13 +109,13 @@ import org.dynmap.common.DynmapPlayer;
 import org.dynmap.common.DynmapServerInterface;
 import org.dynmap.common.DynmapListenerManager.EventType;
 import org.dynmap.debug.Debug;
-import org.dynmap.forge_1_15_2.DmapCommand;
-import org.dynmap.forge_1_15_2.DmarkerCommand;
-import org.dynmap.forge_1_15_2.DynmapCommand;
-import org.dynmap.forge_1_15_2.DynmapMod;
-import org.dynmap.forge_1_15_2.permissions.FilePermissions;
-import org.dynmap.forge_1_15_2.permissions.OpPermissions;
-import org.dynmap.forge_1_15_2.permissions.PermissionProvider;
+import org.dynmap.forge_1_16_2.DmapCommand;
+import org.dynmap.forge_1_16_2.DmarkerCommand;
+import org.dynmap.forge_1_16_2.DynmapCommand;
+import org.dynmap.forge_1_16_2.DynmapMod;
+import org.dynmap.forge_1_16_2.permissions.FilePermissions;
+import org.dynmap.forge_1_16_2.permissions.OpPermissions;
+import org.dynmap.forge_1_16_2.permissions.PermissionProvider;
 import org.dynmap.permissions.PermissionsHandler;
 import org.dynmap.renderer.DynmapBlockState;
 import org.dynmap.utils.DynIntHashMap;
@@ -135,7 +138,6 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import it.unimi.dsi.fastutil.longs.LongSortedSet;
-import net.minecraft.state.IProperty;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
@@ -147,7 +149,7 @@ public class DynmapPlugin
     public SnapshotCache sscache;
     public PlayerList playerList;
     private MapManager mapManager;
-    private net.minecraft.server.MinecraftServer server;
+    private static net.minecraft.server.MinecraftServer server;
     public static DynmapPlugin plugin;
     private ChatHandler chathandler;
     private HashMap<String, Integer> sortWeights = new HashMap<String, Integer>(); 
@@ -209,6 +211,15 @@ public class DynmapPlugin
     	return false;
     }
 
+    private static Registry<Biome> reg = null;
+
+    private static Registry<Biome> getBiomeReg() {
+    	if (reg == null) {
+    		reg = server.func_244267_aX().func_243612_b(Registry.field_239720_u_);
+    	}
+    	return reg;
+    }
+
     /**
      * Initialize block states (org.dynmap.blockstate.DynmapBlockState)
      */
@@ -225,7 +236,7 @@ public class DynmapPlugin
     	Iterator<BlockState> iter = bsids.iterator();
 		while (iter.hasNext()) {
 			BlockState bs = iter.next();
-			int idx = bsids.get(bs);
+			int idx = bsids.getId(bs);
     		if (idx >= stateByID.length) {
     			int plen = stateByID.length;
     			stateByID = Arrays.copyOf(stateByID, idx+1);
@@ -248,7 +259,7 @@ public class DynmapPlugin
             if (!bn.equals(DynmapBlockState.AIR_BLOCK)) {
                 Material mat = bs.getMaterial();
                 String statename = "";
-                for(IProperty p : bs.getProperties()) {
+                for(net.minecraft.state.Property<?> p : bs.func_235904_r_()) {
                 	if (statename.length() > 0) {
                 		statename += ",";
                 	}
@@ -285,19 +296,15 @@ public class DynmapPlugin
         return Item.getItemById(id);
     }
     
-    public static final String getBlockUnlocalizedName(Block b) {
-    	return b.getNameTextComponent().getString();
-    }
-    
     private static Biome[] biomelist = null;
     
     public static final Biome[] getBiomeList() {
         if (biomelist == null) {
         	biomelist = new Biome[256];
-        	Iterator<Biome> iter = ForgeRegistries.BIOMES.iterator();
+        	Iterator<Biome> iter = getBiomeReg().iterator();
         	while (iter.hasNext()) {
                 Biome b = iter.next();
-                int bidx = Registry.BIOME.getId(b);
+                int bidx = getBiomeReg().getId(b);
         		if (bidx >= biomelist.length) {
         			biomelist = Arrays.copyOf(biomelist, bidx + biomelist.length);
         		}
@@ -482,7 +489,7 @@ public class DynmapPlugin
     
     private boolean hasPerm(PlayerEntity psender, String permission) {  
         PermissionsHandler ph = PermissionsHandler.getHandler();
-        if((psender != null) && (ph != null) && ph.hasPermission(psender.getEntity().getName().getString(), permission)) {
+        if ((psender != null) && (ph != null) && ph.hasPermission(psender.getName().getString(), permission)) {
             return true;
         }
         return permissions.has(psender, permission);
@@ -490,7 +497,7 @@ public class DynmapPlugin
     
     private boolean hasPermNode(PlayerEntity psender, String permission) {
         PermissionsHandler ph = PermissionsHandler.getHandler();
-        if((psender != null) && (ph != null) && ph.hasPermissionNode(psender.getEntity().getName().getString(), permission)) {
+        if ((psender != null) && (ph != null) && ph.hasPermissionNode(psender.getName().getString(), permission)) {
             return true;
         }
         return permissions.hasPermissionNode(psender, permission);
@@ -767,7 +774,7 @@ public class DynmapPlugin
         public void broadcastMessage(String msg)
         {
             ITextComponent component = new StringTextComponent(msg);
-            server.getPlayerList().sendMessage(component);
+            server.getPlayerList().func_232641_a_(component, ChatType.SYSTEM, Util.field_240973_b_);
             Log.info(stripChatColor(msg));
         }
         @Override
@@ -951,7 +958,7 @@ public class DynmapPlugin
             while(!blockupdatequeue.isEmpty()) {
                 BlockUpdateRec r = blockupdatequeue.remove();
                 BlockState bs = r.w.getBlockState(new BlockPos(r.x, r.y, r.z));
-                int idx = Block.BLOCK_STATE_IDS.get(bs);
+                int idx = Block.BLOCK_STATE_IDS.getId(bs);
                 if(!org.dynmap.hdmap.HDBlockModels.isChangeIgnoredBlock(stateByID[idx])) {
                     if(onblockchange_with_id)
                         mapManager.touch(r.wid, r.x, r.y, r.z, "blockchange[" + idx + "]");
@@ -1192,7 +1199,7 @@ public class DynmapPlugin
             if (player == null) {
                 return null;
             }
-            Vec3d v = player.getPositionVector();
+            Vector3d v = player.getPositionVec();
             return toLoc(player.world, v.x, v.y, v.z);
         }
         @Override
@@ -1205,7 +1212,7 @@ public class DynmapPlugin
 
             if (player.world != null)
             {
-                return DynmapPlugin.this.getWorld(player.world).getName();
+                return DynmapPlugin.this.getWorld((IServerWorld)player.world).getName();
             }
 
             return null;
@@ -1291,7 +1298,7 @@ public class DynmapPlugin
         public void sendMessage(String msg)
         {
             ITextComponent ichatcomponent = new StringTextComponent(msg);
-            player.sendMessage(ichatcomponent);
+            server.getPlayerList().func_232641_a_(ichatcomponent, ChatType.CHAT, player.getUniqueID());
         }
         @Override
         public boolean isInvisible() {
@@ -1405,9 +1412,9 @@ public class DynmapPlugin
         for(int i = 0; i < list.length; i++) {
             Biome bb = list[i];
             if(bb != null) {
-                String id = bb.getRegistryName().getPath();
-                float tmp = bb.getDefaultTemperature(), hum = bb.getDownfall();
-                int watermult = bb.getWaterColor();
+                String id = bb.toString();
+                float tmp = bb.func_242445_k(), hum = bb.getDownfall();
+                int watermult = bb.func_235089_q_().field_235206_c_;
                 Log.verboseinfo("biome[" + i + "]: hum=" + hum + ", tmp=" + tmp + ", mult=" + Integer.toHexString(watermult));
 
                 BiomeMap bmap = BiomeMap.byBiomeID(i);
@@ -1436,7 +1443,7 @@ public class DynmapPlugin
         for(int i = 0; i < list.length; i++) {
             Biome bb = list[i];
             if (bb != null) {
-                lst[i] = bb.getRegistryName().getPath();
+                lst[i] = bb.toString();
             }
         }
         return lst;
@@ -1488,7 +1495,7 @@ public class DynmapPlugin
         // Extract default permission example, if needed
         File filepermexample = new File(core.getDataFolder(), "permissions.yml.example");
         core.createDefaultFileFromResource("/permissions.yml.example", filepermexample);
-        
+
         DynmapCommonAPIListener.apiInitialized(core);
     }
     
@@ -1630,7 +1637,7 @@ public class DynmapPlugin
 
     private DynmapLocation toLoc(World worldObj, double x, double y, double z)
     {
-        return new DynmapLocation(DynmapPlugin.this.getWorld(worldObj).getName(), x, y, z);
+        return new DynmapLocation(DynmapPlugin.this.getWorld((IServerWorld)worldObj).getName(), x, y, z);
     }
 
     public class PlayerTracker {
@@ -1685,8 +1692,7 @@ public class DynmapPlugin
 			if(!core_enabled) return;
 			IWorld w = event.getWorld();
 			if(!(w instanceof ServerWorld)) return;
-            final ForgeWorld fw = getWorld(w);
-			if (fw == null) return;
+            final ForgeWorld fw = getWorld((IServerWorld)w);
             // This event can be called from off server thread, so push processing there
             core.getServer().scheduleServerTask(new Runnable() {
             	public void run() {
@@ -1700,7 +1706,7 @@ public class DynmapPlugin
 			if(!core_enabled) return;
 			IWorld w = event.getWorld();
             if(!(w instanceof ServerWorld)) return;
-            final ForgeWorld fw = getWorld(w);
+            final ForgeWorld fw = getWorld((IServerWorld)w);
             if(fw != null) {
                 // This event can be called from off server thread, so push processing there
                 core.getServer().scheduleServerTask(new Runnable() {
@@ -1725,7 +1731,7 @@ public class DynmapPlugin
             if(!(w instanceof ServerWorld)) return;
 			IChunk c = event.getChunk();
 			if ((c != null) && (c.getStatus() == ChunkStatus.FULL)) {
-				ForgeWorld fw = getWorld(w, false);
+				ForgeWorld fw = getWorld((IServerWorld)w, false);
 				if (fw != null) {
 					addKnownChunk(fw, c.getPos());
 				}
@@ -1739,7 +1745,7 @@ public class DynmapPlugin
             if(!(w instanceof ServerWorld)) return;
 			IChunk c = event.getChunk();
 			if ((c != null) && (c.getStatus() == ChunkStatus.FULL)) {
-				ForgeWorld fw = getWorld(w, false);
+				ForgeWorld fw = getWorld((IServerWorld)w, false);
 				ChunkPos cp = c.getPos();
 				if (fw != null) {
 					if (!checkIfKnownChunk(fw, cp)) {
@@ -1770,7 +1776,7 @@ public class DynmapPlugin
             if(!(w instanceof ServerWorld)) return;
 			IChunk c = event.getChunk();
 			if ((c != null) && (c.getStatus() == ChunkStatus.FULL)) {
-				ForgeWorld fw = getWorld(w, false);
+				ForgeWorld fw = getWorld((IServerWorld)w, false);
 				ChunkPos cp = c.getPos();
 				if (fw != null) {
 					if (!checkIfKnownChunk(fw, cp)) {
@@ -1798,7 +1804,7 @@ public class DynmapPlugin
         	if(!onblockchange) return;
         	BlockUpdateRec r = new BlockUpdateRec();
         	r.w = event.getWorld();
-			ForgeWorld fw = getWorld(r.w, false);
+			ForgeWorld fw = getWorld((IServerWorld)r.w, false);
 			if (fw == null) return;
 			r.wid = fw.getName();
 			BlockPos p = event.getPos();
@@ -1856,11 +1862,11 @@ public class DynmapPlugin
     	return worlds.get(name);
     }
     
-    private ForgeWorld getWorld(IWorld w) {
+    private ForgeWorld getWorld(IServerWorld w) {
     	return getWorld(w, true);
     }
     
-    private ForgeWorld getWorld(IWorld w, boolean add_if_not_found) {
+    private ForgeWorld getWorld(IServerWorld w, boolean add_if_not_found) {
     	if(last_world == w) {
     		return last_fworld;
     	}
@@ -1911,7 +1917,6 @@ public class DynmapPlugin
         File f = new File(core.getDataFolder(), "forgeworlds.yml");
         if(f.canRead() == false) {
             useSaveFolder = true;
-            ForgeWorld.setSaveFolderMapping();
             return;
         }
         ConfigurationNode cn = new ConfigurationNode(f);
@@ -1922,9 +1927,6 @@ public class DynmapPlugin
         // If setting defined, use it 
         if (cn.containsKey("useSaveFolderAsName")) {
             useSaveFolder = cn.getBoolean("useSaveFolderAsName", useSaveFolder);
-        }
-    	if (useSaveFolder) {
-            ForgeWorld.setSaveFolderMapping();
         }
         List<Map<String,Object>> lst = cn.getMapList("worlds");
         if(lst == null) {
