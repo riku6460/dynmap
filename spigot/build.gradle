@@ -39,6 +39,12 @@ dependencies {
     implementation(project(':bukkit-helper-116')) { 
         transitive = false
     }
+    implementation(project(':bukkit-helper-116-2')) { 
+        transitive = false
+    }
+    implementation(project(':bukkit-helper-116-3')) { 
+        transitive = false
+    }
     implementation(project(':paper-helper')) {
         transitive = false
     }
@@ -73,6 +79,8 @@ shadowJar {
         include(dependency(':bukkit-helper-114-1'))
         include(dependency(':bukkit-helper-115'))
         include(dependency(':bukkit-helper-116'))
+        include(dependency(':bukkit-helper-116-2'))
+        include(dependency(':bukkit-helper-116-3'))
         include(dependency(':paper-helper'))
         include(dependency(':paper-helper-113-2'))
 	}
