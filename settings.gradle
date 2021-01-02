@@ -13,6 +13,7 @@ include ':paper-helper'
 include ':dynmap-api'
 include ':DynmapCore'
 include ':DynmapCoreAPI'
+include ':fabric-1.16.4'
 include ':fabric-1.16.2'
 include ':fabric-1.16.1'
 include ':fabric-1.15.2'
@@ -39,6 +40,7 @@ project(':paper-helper').projectDir = "$rootDir/paper-helper" as File
 project(':dynmap-api').projectDir = "$rootDir/dynmap-api" as File
 project(':DynmapCore').projectDir = "$rootDir/DynmapCore" as File
 project(':DynmapCoreAPI').projectDir = "$rootDir/DynmapCoreAPI" as File
+project(':fabric-1.16.4').projectDir = "$rootDir/fabric-1.16.4" as File
 project(':fabric-1.16.2').projectDir = "$rootDir/fabric-1.16.2" as File
 project(':fabric-1.16.1').projectDir = "$rootDir/fabric-1.16.1" as File
 project(':fabric-1.15.2').projectDir = "$rootDir/fabric-1.15.2" as File
