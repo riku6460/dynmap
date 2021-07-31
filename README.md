@@ -1,39 +1,61 @@
 # Dynmap™ - dynamic web maps for Minecraft servers
 
-## How to build
-Dynmap 3.x+ uses Gradle for building support for all platforms, with all resulting artifacts produced in the /targets directory
+# Jump around the README
+* [How to build](#how-to-build)
+* [What platforms are supported?](#what-platforms-are-supported)
+* [Data Storage](#data-storage)
+* [Contributing to Dynmap's Code](#contributing-to-dynmaps-code)
+* [Porting, Supporting Other Platforms, Customized Dynmap Builds](#porting-supporting-other-platforms-customized-dynmap-builds)
+* [Where to go for questions and discussions](#where-to-go-for-questions-and-discussions)
+* [Where to go to make donations](#where-to-go-to-make-donations)
+# How to build
+Dynmap 3.x+ uses Gradle for building support for all platforms, with all resulting artifacts produced in the /targets directory.  Due to Minecraft 1.17.x+ requirements, the developer's
+default JDK must be a JDK 16 (or later) versions - older versions will still be compiled
+to run on the default JDK for those platforms (JDK 8), as will all common libraries.
 
 To build, run:
 
-    ./gradlew clean build install
+    ./gradlew clean build
+    cd oldgradle
+    ./gradlew clean build
     
 Or (on Windows):
 
-    gradlew.bat clean build install
+    gradlew.bat clean build
+    cd oldgradle
+    gradlew.bat clean build
     
 # What platforms are supported?
-The following target platforms are supported:
-- Spigot/PaperMC - via the Dynmap-<version>-spigot.jar plugin (supports MC v1.11.2 through v1.16.4)
-- Forge v1.11.2 - via Dynmap-<version>-forge-1.11.2.jar mod
-- Forge v1.12.2 - via Dynmap-<version>-forge-1.12.2.jar mod
-- Forge v1.13.2 - via Dynmap-<version>-forge-1.13.2.jar mod
-- Forge v1.14.4 - via Dynmap-<version>-forge-1.14.4.jar mod
-- Forge v1.15.2 - via Dynmap-<version>-forge-1.15.2.jar mod
-- Forge v1.16.1 - via Dynmap-<version>-forge-1.16.1.jar mod
-- Forge v1.16.2 - via Dynmap-<version>-forge-1.16.2.jar mod
-- Forge v1.16.3 - via Dynmap-<version>-forge-1.16.3.jar mod
-- Forge v1.16.4 - via Dynmap-<version>-forge-1.16.4.jar mod
-- Fabric v1.15.2 - via Dynmap-<version>-fabric-1.15.2.jar mod
-- Fabric v1.16.1 - via Dynmap-<version>-fabric-1.16.1.jar mod
-- Fabric v1.16.2 - via Dynmap-<version>-fabric-1.16.2.jar mod
-- Fabric v1.16.4 - via Dynmap-<version>-fabric-1.16.4.jar mod
+The following target platforms are supported, and you can find them at the links supplied:
+
+| Server type  | Version | Dynmap JAR | Where? |
+| ------------ | ------- | ---------- | ------ |
+| Spigot/PaperMC | ≤1.17.1  | `Dynmap-<version>-spigot.jar` | [SpigotMC](https://www.spigotmc.org/resources/dynmap.274/) |
+| Spigot/PaperMC | ≤1.17.1 | `Dynmap-<version>-spigot.jar` | [GitHub Releases](https://github.com/webbukkit/dynmap/releases) |
+| Forge | 1.11.2 | `Dynmap-<version>-forge-1.11.2.jar` | [GitHub Releases](https://github.com/webbukkit/dynmap/releases) |
+| Forge | 1.12.2 | `Dynmap-<version>-forge-1.12.2.jar` | [GitHub Releases](https://github.com/webbukkit/dynmap/releases) |
+| Forge | 1.13.2 | `Dynmap-<version>-forge-1.13.2.jar` | [GitHub Releases](https://github.com/webbukkit/dynmap/releases) |
+| Forge | 1.14.4 | `Dynmap-<version>-forge-1.14.4.jar` | [GitHub Releases](https://github.com/webbukkit/dynmap/releases) |
+| Forge | 1.15.2 | `Dynmap-<version>-forge-1.15.2.jar` | [GitHub Releases](https://github.com/webbukkit/dynmap/releases) |
+| Forge | 1.16.1 | `Dynmap-<version>-forge-1.16.1.jar` | [GitHub Releases](https://github.com/webbukkit/dynmap/releases) |
+| Forge | 1.16.2 | `Dynmap-<version>-forge-1.16.2.jar` | [Curseforge](https://www.curseforge.com/minecraft/mc-mods/dynmapforge) |
+| Forge | 1.16.3 | `Dynmap-<version>-forge-1.16.3.jar` | [Curseforge](https://www.curseforge.com/minecraft/mc-mods/dynmapforge) |
+| Forge | 1.16.4 | `Dynmap-<version>-forge-1.16.4.jar` | [Curseforge](https://www.curseforge.com/minecraft/mc-mods/dynmapforge) |
+| Forge | 1.16.5 | `Dynmap-<version>-forge-1.16.5.jar` | [Curseforge](https://www.curseforge.com/minecraft/mc-mods/dynmapforge) |
+| Forge | 1.17.1 | `Dynmap-<version>-forge-1.17.1.jar` | [Curseforge](https://www.curseforge.com/minecraft/mc-mods/dynmapforge) |
+| Fabric | 1.15.2 | `Dynmap-<version>-fabric-1.15.2.jar` | [Curseforge](https://www.curseforge.com/minecraft/mc-mods/dynmapforge) |
+| Fabric | 1.16.1 | `Dynmap-<version>-fabric-1.16.1.jar` | [Curseforge](https://www.curseforge.com/minecraft/mc-mods/dynmapforge) |
+| Fabric | 1.16.2 | `Dynmap-<version>-fabric-1.16.2.jar` | [Curseforge](https://www.curseforge.com/minecraft/mc-mods/dynmapforge) |
+| Fabric | 1.16.4 | `Dynmap-<version>-fabric-1.16.4.jar` | [Curseforge](https://www.curseforge.com/minecraft/mc-mods/dynmapforge) |
+| Fabric | 1.17 | `Dynmap-<version>-fabric-1.17.jar` | [Curseforge](https://www.curseforge.com/minecraft/mc-mods/dynmapforge) |
+| Fabric | 1.17.1 | `Dynmap-<version>-fabric-1.17.1.jar` | [Curseforge](https://www.curseforge.com/minecraft/mc-mods/dynmapforge) |
     
 # Data Storage
 Dynmap supports the following storage backends:
 - Flat files: The default for a new installation
 - SQLite
 - MySQL
-- PostgreSQL
+- PostgreSQL (JDBC driver for this is now bundled with the Dynmap JAR)
 - MariaDB
 
 # Contributing to Dynmap's Code
@@ -58,16 +80,16 @@ that code being subject to the APL v2.
 - Do not include any code that unconditionally adds to Dynmap's hosting requirements - for example, support for a database can be added, but the use of the
 database (which likely depends on a database server being deployed and configured by the user) cannot become an unconditional requirement in order to run
 Dynmap.  Features can add the option to exploit new or additional technologies, but cannot add unconditionally to the minimum requirements on the supported
-platforms (which is what is needed to run the corresponiding MC server, plus the Dynmap plugin or mod)
+platforms (which is what is needed to run the corresponding MC server, plus the Dynmap plugin or mod)
 - Dynmap is built and supports running on Java 8 - it can run on newer versions, but any contributed code and dependencies MUST support being compiled and run
 using just Java 8.
-- Don't introduce other language depdendencies - Java only: no Kotlin, Scala, JRuby, whatever. They just add runtime dependencies that most of the platforms lack,
+- Don't introduce other language dependencies - Java only: no Kotlin, Scala, JRuby, whatever. They just add runtime dependencies that most of the platforms lack,
 and language skills above and beyond the Java language requirements the code base already mandates, which just creates obstacles to other people contributing.
 - Similarly, do not update existing libraries and dependencies - these are often tied to the versions on various platforms, and updates will likely break runtime
 - Do not include code specific to other plugins or mods.  Dynmap has APIs for the purpose of avoiding the problem of working with other mods - there are many 
 'Dynmap-XXX' mods and plugins which use the APIs to provide support for other mods and plugins (WorldGuard, Nucleus, Citizens, dozens of others).  Maintaining
 interfaces in Dynmap particular to dozens of mods on multiple versions of multiple platforms is unmanageable, so we don't do it.  The ONLY exception currently
-are security mods - although, even for those, leverage of platform-standard security interfaces is always preferred (e.g. Sponge or Bukket standard permissions)
+are security mods - although, even for those, leverage of platform-standard security interfaces is always preferred (e.g. Sponge or Bukkit standard permissions)
 
 # Porting, Supporting Other Platforms, Customized Dynmap Builds
 While Dynmap is open source, subject to the Apache Public License, v2, the Dynmap team does have specific policies and requirements for anyone that would
@@ -81,7 +103,7 @@ not yet (or no longer) supported by the Dynmap team.  If the Dynmap team comes t
 cease distribution of the unofficial version, unless otherwise authorized to continue doing so.  Further:
     - The team distributing the modified version must cite the origin of the Dynmap code, but must also clearly indicate that the version is NOT supported by
     nor endorsed by the Dynmap team, and that ALL support should be directed through the team providing the modified version.
-    - Any modified version CANNOT be monitized or otherwise charged for, under any circumstances, nor can redistribution of it be limited or restricted.
+    - Any modified version CANNOT be monetized or otherwise charged for, under any circumstances, nor can redistribution of it be limited or restricted.
     - The modified code must continue to be Apache Public License v2, with no additional conditions or restrictions, including full public availability of the
     modified source code.
     - Any code from Dynmap used in such versions should be built from an appropriate fork, as DynmapCore and other components (other than DynmapCoreAPI and 
@@ -89,8 +111,8 @@ cease distribution of the unofficial version, unless otherwise authorized to con
     least, removed).  The modified version should NOT refer to the Dynmap Discord nor to /r/Dynmap on Reddit for support. in any case.
     - Any bugs or issues opened in conjunction with the use of the modified version on this repository will be closed without comment.
 
-Additions of new funtion, including new platform support, in this official Dynmap code base MUST be fully contained within the PRs submitted to this 
-repository.  Further, it is always exptected than any updates will be built and tested across all relevant platforms - meaning anh chances to shared code 
+Additions of new functions, including new platform support, in this official Dynmap code base MUST be fully contained within the PRs submitted to this 
+repository.  Further, it is always expected than any updates will be built and tested across all relevant platforms - meaning any chances to shared code 
 components (DynmapCore, DynmapCoreAPI) MUST be successfully built and tested on ALL supported platforms (Forge, Spigot, etc).  Changes which break 
 supported platforms will be rejected.
 

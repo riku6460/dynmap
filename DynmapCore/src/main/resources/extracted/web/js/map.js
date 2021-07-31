@@ -25,7 +25,7 @@ function DynMap(options) {
 	if(me.checkForSavedURL())
 		return;
 	me.options = options;
-	$.getJSON(me.options.url.configuration, function(configuration) {
+	$.getJSON(me.formatUrl("configuration", { timestamp: me.lasttimestamp }), function(configuration) {
 		if(configuration.error == 'login-required') {
 			me.saveURL();
 			window.location = 'login.html';
@@ -47,7 +47,7 @@ DynMap.prototype = {
 	registeredTiles: [],
 	players: {},
 	
-	lasttimestamp: new Date().getUTCMilliseconds(), /* Pseudorandom - prevent cached '?0' */
+	lasttimestamp: new Date().getTime(), /* Pseudorandom - prevent cached '?0' */
 	reqid: 0,
     servertime: 0,
     serverday: false,
@@ -635,6 +635,11 @@ DynMap.prototype = {
 	},
 	update: function() {
 		var me = this;
+
+		if (document.visibilityState === "hidden") {
+		    setTimeout(function() { me.update(); }, me.options.updaterate);
+			return;
+		}
 
 		$(me).trigger('worldupdating');
 		$.getJSON(me.formatUrl('update', { world: me.world.name, timestamp: me.lasttimestamp, reqid: me.reqid }), function(update) {

@@ -2,8 +2,9 @@
 description = 'paper-helper-113-2'
 
 dependencies {
-    compile project(':bukkit-helper-113-2')
-    compile project(':dynmap-api')
-    compile project(path: ':DynmapCore', configuration: 'shadow')
-    compile group: 'com.destroystokyo.paper', name: 'paper-api', version:'1.13.2-R0.1-SNAPSHOT'
+  implementation project(':bukkit-helper')
+  implementation project(':bukkit-helper-113-2')
+  implementation project(':dynmap-api')
+  implementation project(path: ':DynmapCore', configuration: 'shadow')
+  implementation group: 'com.destroystokyo.paper', name: 'paper-api', version:'1.13.2-R0.1-SNAPSHOT'
 }

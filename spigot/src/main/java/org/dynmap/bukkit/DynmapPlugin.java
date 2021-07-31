@@ -15,6 +15,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
@@ -105,7 +106,7 @@ import org.dynmap.renderer.DynmapBlockState;
 import org.dynmap.utils.MapChunkCache;
 import org.dynmap.utils.Polygon;
 import org.dynmap.utils.VisibilityLimit;
-import skinsrestorer.bukkit.SkinsRestorer;
+import net.skinsrestorer.bukkit.SkinsRestorer;
 
 public class DynmapPlugin extends JavaPlugin implements DynmapAPI {
     private DynmapCore core;
@@ -140,7 +141,7 @@ public class DynmapPlugin extends JavaPlugin implements DynmapAPI {
     private BukkitWorld last_bworld;
     
     private BukkitVersionHelper helper;
-    
+
     private final BukkitWorld getWorldByName(String name) {
         if((last_world != null) && (last_world.getName().equals(name))) {
             return last_bworld;
@@ -170,6 +171,32 @@ public class DynmapPlugin extends JavaPlugin implements DynmapAPI {
             last_world = null;
             last_bworld = null;
         }
+    }
+    
+    // Nonblocking thread safety
+    private static final AtomicBoolean tryNativeId = new AtomicBoolean(true);
+    @SuppressWarnings("deprecation")
+    private static final int getBlockIdFromMaterial(Material material) {
+        if (tryNativeId.get()) {
+            try {
+                return material.getId();
+            } catch (NoSuchMethodError e) {
+                // We failed once, no need to retry
+                tryNativeId.set(false);
+            } catch (java.lang.IllegalArgumentException e) {
+                // Ignore this entirely, as modern materials throw
+                // java.lang.IllegalArgumentException: Cannot get ID of Modern Material
+            }
+        }
+
+        // We're living in a world where numerical IDs have been phased out completely.
+        // Let's return *some* number, because we need one.
+        // Also in that case we are adding a constant to ensure we're not conflicting with the
+        // actual IDs
+        return material.ordinal() + (1 << 20);
+    }
+    private static final int getBlockIdFromBlock(Block block) {
+        return getBlockIdFromMaterial(block.getType());
     }
     
     private class BukkitEnableCoreCallback extends DynmapCore.EnableCoreCallbacks {
@@ -213,7 +240,7 @@ public class DynmapPlugin extends JavaPlugin implements DynmapAPI {
         public int getBlockIDAt(String wname, int x, int y, int z) {
             World w = getServer().getWorld(wname);
             if((w != null) && w.isChunkLoaded(x >> 4, z >> 4)) {
-                return w.getBlockTypeIdAt(x,  y,  z);
+                return getBlockIdFromBlock(w.getBlockAt(x, y, z));
             }
             return -1;
         }
@@ -911,13 +938,18 @@ public class DynmapPlugin extends JavaPlugin implements DynmapAPI {
         SkinsRestorerSkinUrlProvider skinUrlProvider = null;
 
         if (core.configuration.getBoolean("skinsrestorer-integration", false)) {
-            SkinsRestorer skinsRestorer = (SkinsRestorer) getServer().getPluginManager().getPlugin("SkinsRestorer");
+            try {
+                SkinsRestorer skinsRestorer = (SkinsRestorer) getServer().getPluginManager().getPlugin("SkinsRestorer");
 
-            if (skinsRestorer == null) {
-                Log.warning("SkinsRestorer integration can't be enabled because SkinsRestorer not installed");
-            } else {
-                skinUrlProvider = new SkinsRestorerSkinUrlProvider(skinsRestorer);
-                Log.info("SkinsRestorer integration enabled");
+                if (skinsRestorer == null) {
+                    Log.warning("SkinsRestorer integration can't be enabled because SkinsRestorer not installed");
+                } else {
+                    skinUrlProvider = new SkinsRestorerSkinUrlProvider();
+                    Log.info("SkinsRestorer API v14 integration enabled");
+                }
+            } catch(NoClassDefFoundError e) {
+                Log.warning("You are using unsupported version of SkinsRestorer. Use v14 or newer.");
+                Log.warning("Disabled SkinsRestorer integration for this session");
             }
         }
 
@@ -1181,7 +1213,7 @@ public class DynmapPlugin extends JavaPlugin implements DynmapAPI {
                 World w = loc.getWorld();
                 if(!w.isChunkLoaded(loc.getBlockX()>>4, loc.getBlockZ()>>4))
                     continue;
-                int bt = w.getBlockTypeIdAt(loc);
+                int bt = getBlockIdFromBlock(w.getBlockAt(loc));
                 /* Avoid stationary and moving water churn */
                 if(bt == 9) bt = 8;
                 if(btt.typeid == 9) btt.typeid = 8;
@@ -1208,7 +1240,7 @@ public class DynmapPlugin extends JavaPlugin implements DynmapAPI {
     private void checkBlock(Block b, String trigger) {
         BlockToCheck btt = new BlockToCheck();
         btt.loc = b.getLocation();
-        btt.typeid = b.getTypeId();
+        btt.typeid = getBlockIdFromBlock(b);
         btt.data = b.getData();
         btt.trigger = trigger;
         blocks_to_check_accum.add(btt); /* Add to accumulator */
@@ -1336,11 +1368,13 @@ public class DynmapPlugin extends JavaPlugin implements DynmapAPI {
                 public void onBlockFromTo(BlockFromToEvent event) {
                     Block b = event.getBlock();
                     Material m = b.getType();
-                    if((m != Material.WOOD_PLATE) && (m != Material.STONE_PLATE) && (m != null)) 
+                    String m_id = (m != null) ? m.toString() : "";
+                    boolean not_pressure_plate = (m_id != "WOOD_PLATE") && (m_id != "STONE_PLATE") && (!m_id.contains("PRESSURE_PLATE")) && (m_id != "");
+                    if (not_pressure_plate)
                         checkBlock(b, "blockfromto");
                     b = event.getToBlock();
                     m = b.getType();
-                    if((m != Material.WOOD_PLATE) && (m != Material.STONE_PLATE) && (m != null)) 
+                    if (not_pressure_plate)
                         checkBlock(b, "blockfromto");
                 }
             };

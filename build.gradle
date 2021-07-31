@@ -1,7 +1,6 @@
 plugins {
     id  "com.github.johnrengelman.shadow" version "2.0.4"
     id  'java'
-    id  'maven'
     id  'maven-publish'
 }
 
@@ -19,7 +18,7 @@ allprojects  {
   apply plugin: 'java'
   
   group = 'us.dynmap'
-  version = '3.1-SNAPSHOT'
+  version = '3.2-SNAPSHOT'
 
 }
 
@@ -33,7 +32,6 @@ ext {
 subprojects {  
   apply plugin: "com.github.johnrengelman.shadow"
   apply plugin: 'java'
-  apply plugin: 'maven'
   apply plugin: 'maven-publish'
 
   sourceCompatibility = 1.8

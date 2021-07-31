@@ -18,6 +18,7 @@ import java.util.Queue;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.stream.Collectors;
 
 import org.dynmap.ConfigurationNode;
 import org.dynmap.DynmapCore;
@@ -148,7 +149,7 @@ public class FileTreeMapStorage extends MapStorage {
         }
 
         @Override
-        public boolean write(long hash, BufferOutputStream encImage) {
+        public boolean write(long hash, BufferOutputStream encImage, long timestamp) {
             File ff = getTileFile(map.getImageFormat().getEncoding());
             List<File> ffalt = getTileFilesAltFormats();
             File ffpar = ff.getParentFile();
@@ -170,7 +171,7 @@ public class FileTreeMapStorage extends MapStorage {
             if (ffpar.exists() == false) {
                 ffpar.mkdirs();
             }
-            if (replaceFile(ff, encImage.buf, encImage.len) == false) {
+            if (replaceFile(ff, encImage.buf, encImage.len, timestamp) == false) {
                 return false;
             }
             hashmap.updateHashCode(world.getName() + "." + map.getPrefix(), x, y, hash);
@@ -265,12 +266,13 @@ public class FileTreeMapStorage extends MapStorage {
             TimerTask task = new TimerTask() {
                 @Override
                 public void run() {
-                    int size = cloudflarePurges.size();
-                    if (size <= 0) return;
+                    if (cloudflarePurges.isEmpty()) {
+                        return;
+                    }
 
                     List<String> paths = new ArrayList<>();
-                    for (int i = 0; i < 30 && i < size; i++) {
-                        paths.add(node.get("url") + cloudflarePurges.poll());
+                    for (int i = 0; i < 30 && !cloudflarePurges.isEmpty(); i++) {
+                        paths.add(cloudflarePurges.poll());
                     }
 
                     try {
@@ -283,15 +285,16 @@ public class FileTreeMapStorage extends MapStorage {
                         connection.setDoOutput(true);
 
                         try (OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream())) {
-                            writer.write("{\"files\":" + JSONArray.toJSONString(paths) + "}");
+                            String prefix = (String) node.get("url");
+                            writer.write("{\"files\":" + JSONArray.toJSONString(paths.stream()
+                                    .map(prefix::concat)
+                                    .collect(Collectors.toList())) + "}");
                         }
 
-                        connection.connect();
-
                         connection.getResponseCode();
-
                         connection.disconnect();
                     } catch (IOException e) {
+                        cloudflarePurges.addAll(paths);
                         e.printStackTrace();
                     }
                 }
@@ -680,8 +683,12 @@ public class FileTreeMapStorage extends MapStorage {
     public String getTilesURI(boolean login_enabled) {
         return login_enabled?"standalone/tiles.php?tile=":"tiles/";
     }
-    
+
     private boolean replaceFile(File f, byte[] b, int len) {
+        return replaceFile(f, b, len, System.currentTimeMillis());
+    }
+    
+    private boolean replaceFile(File f, byte[] b, int len, long timestamp) {
         boolean done = false;
         File fold = new File(f.getPath() + ".old");
         File fnew = new File(f.getPath() + ".new");
@@ -716,6 +723,8 @@ public class FileTreeMapStorage extends MapStorage {
                     }
                     cloudflarePurges.add(path);
                 }
+                // Use the supplied timestamp
+                f.setLastModified(timestamp);
                 done = true;
             } catch (IOException iox) {
                 if (raf != null) { try { raf.close(); } catch (IOException x) {} }
