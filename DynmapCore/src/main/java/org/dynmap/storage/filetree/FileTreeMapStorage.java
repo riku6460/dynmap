@@ -18,6 +18,7 @@ import java.util.Queue;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.stream.Collectors;
 
 import org.dynmap.ConfigurationNode;
 import org.dynmap.DynmapCore;
@@ -265,12 +266,13 @@ public class FileTreeMapStorage extends MapStorage {
             TimerTask task = new TimerTask() {
                 @Override
                 public void run() {
-                    int size = cloudflarePurges.size();
-                    if (size <= 0) return;
+                    if (cloudflarePurges.isEmpty()) {
+                        return;
+                    }
 
                     List<String> paths = new ArrayList<>();
-                    for (int i = 0; i < 30 && i < size; i++) {
-                        paths.add(node.get("url") + cloudflarePurges.poll());
+                    for (int i = 0; i < 30 && !cloudflarePurges.isEmpty(); i++) {
+                        paths.add(cloudflarePurges.poll());
                     }
 
                     try {
@@ -283,15 +285,16 @@ public class FileTreeMapStorage extends MapStorage {
                         connection.setDoOutput(true);
 
                         try (OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream())) {
-                            writer.write("{\"files\":" + JSONArray.toJSONString(paths) + "}");
+                            String prefix = (String) node.get("url");
+                            writer.write("{\"files\":" + JSONArray.toJSONString(paths.stream()
+                                    .map(prefix::concat)
+                                    .collect(Collectors.toList())) + "}");
                         }
 
-                        connection.connect();
-
                         connection.getResponseCode();
-
                         connection.disconnect();
                     } catch (IOException e) {
+                        cloudflarePurges.addAll(paths);
                         e.printStackTrace();
                     }
                 }
