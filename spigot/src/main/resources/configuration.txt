@@ -509,5 +509,4 @@ cloudflare:
   enable: false
   url: "https://example.com/tiles/"
   zone_id: ""
-  email: ""
-  key: ""
+  token: ""

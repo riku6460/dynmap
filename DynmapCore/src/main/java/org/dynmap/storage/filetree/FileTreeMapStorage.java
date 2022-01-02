@@ -280,8 +280,7 @@ public class FileTreeMapStorage extends MapStorage {
                         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                         connection.setRequestMethod("POST");
                         connection.addRequestProperty("Content-Type", "application/json");
-                        connection.addRequestProperty("X-Auth-Email", node.getString("email"));
-                        connection.addRequestProperty("X-Auth-Key", node.getString("key"));
+                        connection.addRequestProperty("Authorization", "Bearer " + node.getString("token"));
                         connection.setDoOutput(true);
 
                         try (OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream())) {
