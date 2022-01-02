@@ -37,7 +37,7 @@ import org.dynmap.storage.MapStorageBaseTileEnumCB;
 import org.dynmap.storage.MapStorageTileSearchEndCB;
 import org.dynmap.utils.BufferInputStream;
 import org.dynmap.utils.BufferOutputStream;
-import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 public class FileTreeMapStorage extends MapStorage {
     private File baseTileDir;
@@ -286,9 +286,11 @@ public class FileTreeMapStorage extends MapStorage {
 
                         try (OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream())) {
                             String prefix = (String) node.get("url");
-                            writer.write("{\"files\":" + JSONArray.toJSONString(paths.stream()
+                            JSONObject object = new JSONObject();
+                            object.put("files", paths.stream()
                                     .map(prefix::concat)
-                                    .collect(Collectors.toList())) + "}");
+                                    .collect(Collectors.toList()));
+                            writer.write(object.toJSONString());
                         }
 
                         connection.getResponseCode();
