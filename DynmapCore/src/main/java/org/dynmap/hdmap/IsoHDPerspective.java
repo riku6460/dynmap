@@ -976,7 +976,7 @@ public class IsoHDPerspective implements HDPerspective {
         if(mscale > MAX_SCALE) mscale = MAX_SCALE;
         basemodscale = mscale;
         /* Get max and min height */
-        maxheight = configuration.getInteger("maximumheight", -1);
+        maxheight = configuration.getInteger("maximumheight", Integer.MIN_VALUE);
         
         minheight = configuration.getInteger("minimumheight", Integer.MIN_VALUE);
         /* Generate transform matrix for world-to-tile coordinate mapping */
@@ -1234,7 +1234,7 @@ public class IsoHDPerspective implements HDPerspective {
         boolean shaderdone[] = new boolean[numshaders];
         boolean rendered[] = new boolean[numshaders];
         double height = maxheight;
-        if(height < 0) {    /* Not set - assume world height - 1 */
+        if (height == Integer.MIN_VALUE) {    /* Not set - assume world height - 1 */
             if (isnether)
                 height = 127;
             else
@@ -1248,8 +1248,8 @@ public class IsoHDPerspective implements HDPerspective {
         for(int x = 0; x < tileWidth * sizescale; x++) {
             ps.px = x;
             for(int y = 0; y < tileHeight * sizescale; y++) {
-                ps.top.x = ps.bottom.x = xbase + ((double)x)/sizescale + 0.5;    /* Start at center of pixel at Y=height+0.5, bottom at Y=-0.5 */
-                ps.top.y = ps.bottom.y = ybase + ((double)y)/sizescale + 0.5;
+                ps.top.x = ps.bottom.x = xbase + (x + 0.5) / sizescale;    /* Start at center of pixel at Y=height+0.5, bottom at Y=-0.5 */
+                ps.top.y = ps.bottom.y = ybase + (y + 0.5) / sizescale;
                 ps.top.z = height + 0.5; ps.bottom.z = miny - 0.5;
                 map_to_world.transform(ps.top);            /* Transform to world coordinates */
                 map_to_world.transform(ps.bottom);
@@ -1263,6 +1263,7 @@ public class IsoHDPerspective implements HDPerspective {
                     ps.raytrace(cache, shaderstate, shaderdone);
                 } catch (Exception ex) {
                     Log.severe("Error while raytracing tile: perspective=" + this.name + ", coord=" + mapiter.getX() + "," + mapiter.getY() + "," + mapiter.getZ() + ", blockid=" + mapiter.getBlockType() + ", lighting=" + mapiter.getBlockSkyLight() + ":" + mapiter.getBlockEmittedLight() + ", biome=" + mapiter.getBiome().toString(), ex);
+                    ex.printStackTrace();
                 }
                 for(int i = 0; i < numshaders; i++) {
                     if(shaderdone[i] == false) {

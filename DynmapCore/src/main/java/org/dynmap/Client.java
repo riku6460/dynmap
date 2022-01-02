@@ -165,6 +165,10 @@ public class Client {
         /* Handle Essentials nickname encoding too */
         int idx = 0;
         while((idx = s.indexOf('&', idx)) >= 0) {
+            if(idx + 1 >= s.length()) { /* No character after this ampersand */
+                break;
+            }
+
             char c = s.charAt(idx+1);   /* Get next character */
             if(c == '&') {  /* Another ampersand */
                 s = s.substring(0, idx) + s.substring(idx+1);
@@ -223,6 +227,26 @@ public class Client {
                     if (codes[j][0].charAt(0) == c) {   // Matching code?
                         sb.append(codes[j][1]); // Substitute
                         spancnt++;
+                        break;
+                    }
+                    else if (c == 'x') { // Essentials nickname hexcode format
+                        if (i + 12 <= cnt){ // Check if string is at least long enough to be valid hexcode
+                            if (s.charAt(i+1) == s.charAt(i+3) &&
+                                s.charAt(i+1) == s.charAt(i+5) &&
+                                s.charAt(i+1) == s.charAt(i+7) &&
+                                s.charAt(i+1) == s.charAt(i+9) &&
+                                s.charAt(i+1) == s.charAt(i+11) && // Check if there are enough \u00A7 in a row
+                                s.charAt(i+1) == '\u00A7'){ 
+                                    StringBuilder hex = new StringBuilder().append(s.charAt(i+2))
+                                                                            .append(s.charAt(i+4))
+                                                                            .append(s.charAt(i+6))
+                                                                            .append(s.charAt(i+8))
+                                                                            .append(s.charAt(i+10))
+                                                                            .append(s.charAt(i+12)); // Build hexcode string
+                                    sb.append("<span style=\'color:#" + hex + "\'>"); // Substitute with hexcode
+                                i = i + 12; //move past hex codes
+                            }
+                        }
                         break;
                     }
                 }
