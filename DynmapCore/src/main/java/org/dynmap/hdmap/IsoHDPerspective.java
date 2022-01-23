@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.dynmap.Client;
 import org.dynmap.Color;
@@ -27,6 +28,7 @@ import org.dynmap.renderer.RenderPatchFactory.SideVisible;
 import org.dynmap.storage.MapStorage;
 import org.dynmap.storage.MapStorageTile;
 import org.dynmap.utils.BlockStep;
+import org.dynmap.utils.DynIntHashMap;
 import org.dynmap.hdmap.TexturePack.BlockTransparency;
 import org.dynmap.utils.DynmapBufferedImage;
 import org.dynmap.utils.LightLevels;
@@ -79,6 +81,9 @@ public class IsoHDPerspective implements HDPerspective {
 
     private static final BlockStep [] semi_steps = { BlockStep.Y_PLUS, BlockStep.X_MINUS, BlockStep.X_PLUS, BlockStep.Z_MINUS, BlockStep.Z_PLUS };
     
+    // Cache for custom meshes by state (shared, reusable)
+    private static RenderPatch[][] custom_meshes_by_globalstateindex = null;
+
     private class OurPerspectiveState implements HDPerspectiveState {
         DynmapBlockState blocktype = DynmapBlockState.AIR;
         DynmapBlockState lastblocktype = DynmapBlockState.AIR;
@@ -149,8 +154,8 @@ public class IsoHDPerspective implements HDPerspective {
             llcache = new LightLevels[4];
             for(int i = 0; i < llcache.length; i++)
                 llcache[i] = new LightLevels();
-            custom_meshes = new DynLongHashMap();
-            custom_fluid_meshes = new DynLongHashMap();
+            custom_meshes = new DynLongHashMap(4096);
+            custom_fluid_meshes = new DynLongHashMap(4096);
             modscale = basemodscale << scaled;
             scalemodels = HDBlockModels.getModelsForScale(basemodscale << scaled);
         }
@@ -158,13 +163,9 @@ public class IsoHDPerspective implements HDPerspective {
         private final void updateSemitransparentLight(LightLevels ll) {
         	int emitted = 0, sky = 0;
         	for(int i = 0; i < semi_steps.length; i++) {
-        	    BlockStep s = semi_steps[i];
-        		mapiter.stepPosition(s);
-        		int v = mapiter.getBlockEmittedLight();
-        		if(v > emitted) emitted = v;
-        		v = mapiter.getBlockSkyLight();
-        		if(v > sky) sky = v;
-        		mapiter.unstepPosition(s);
+        		int emit_sky_light = mapiter.getBlockLight(semi_steps[i]);
+        		if ((emit_sky_light >> 8) > emitted) emitted = (emit_sky_light >> 8);
+        		if ((emit_sky_light & 0xF) > sky) sky = (emit_sky_light & 0xF);
         	}
         	ll.sky = sky;
         	ll.emitted = emitted;
@@ -181,16 +182,10 @@ public class IsoHDPerspective implements HDPerspective {
             		ll.emitted = mapiter.getBlockEmittedLight();
             		break;
             	case OPAQUE:
-        			if(HDBlockStateTextureMap.getTransparency(lastblocktype) != BlockTransparency.SEMITRANSPARENT) {
-                		mapiter.unstepPosition(laststep);  /* Back up to block we entered on */
-                		if(mapiter.getY() < worldheight) {
-                		    ll.sky = mapiter.getBlockSkyLight();
-                		    ll.emitted = mapiter.getBlockEmittedLight();
-                		} else {
-                		    ll.sky = 15;
-                		    ll.emitted = 0;
-                		}
-                		mapiter.stepPosition(laststep);
+        			if (HDBlockStateTextureMap.getTransparency(lastblocktype) != BlockTransparency.SEMITRANSPARENT) {
+        				int emit_sky_light = mapiter.getBlockLight(laststep.opposite());
+            		    ll.sky = emit_sky_light & 0xF;
+            		    ll.emitted = emit_sky_light >> 8;
         			}
         			else {
                 		mapiter.unstepPosition(laststep);  /* Back up to block we entered on */
@@ -564,7 +559,15 @@ public class IsoHDPerspective implements HDPerspective {
                             this.setCustomFluidMesh(patches);
                         }
                     }
-                    else {
+                    // Else, if block state specific model
+                    else if (cbm.isOnlyBlockStateSensitive()) {
+                    	patches = this.getCustomMeshForState(bt);	// Look up mesh by state
+                    	if (patches == null) {	// Miss, generate it
+                            patches = cbm.getMeshForBlock(mapiter);
+                            this.setCustomMeshForState(bt, patches);
+                    	}
+                    }
+                    else {	// Else, block specific
                         patches = this.getCustomMesh();
                         if (patches == null) {
                             patches = cbm.getMeshForBlock(mapiter);
@@ -930,11 +933,23 @@ public class IsoHDPerspective implements HDPerspective {
             return (RenderPatch[])custom_meshes.get(key);
         }
         /**
+         * Get custom mesh for block, if defined (null if not)
+         */
+        public final RenderPatch[] getCustomMeshForState(DynmapBlockState bs) {
+            return (RenderPatch[]) custom_meshes_by_globalstateindex[bs.globalStateIndex];
+        }
+        /**
          * Save custom mesh for block
          */
         public final void setCustomMesh(RenderPatch[] mesh) {
             long key = this.mapiter.getBlockKey();  /* Get key for current block */
             custom_meshes.put(key,  mesh);
+        }
+        /**
+         * Set custom mesh for block, if defined (null if not)
+         */
+        public final void setCustomMeshForState(DynmapBlockState bs, RenderPatch[] mesh) {
+            custom_meshes_by_globalstateindex[bs.globalStateIndex] = mesh;
         }
         /**
          * Get custom fluid mesh for block, if defined (null if not)
@@ -953,6 +968,9 @@ public class IsoHDPerspective implements HDPerspective {
     }
     
     public IsoHDPerspective(DynmapCore core, ConfigurationNode configuration) {
+    	if (custom_meshes_by_globalstateindex == null) {
+    		custom_meshes_by_globalstateindex = new RenderPatch[DynmapBlockState.getGlobalIndexMax()][];
+    	}
         name = configuration.getString("name", null);
         if(name == null) {
             Log.severe("Perspective definition missing name - must be defined and unique");

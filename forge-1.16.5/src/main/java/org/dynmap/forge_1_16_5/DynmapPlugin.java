@@ -271,7 +271,13 @@ public class DynmapPlugin
                 	}
                 	statename += p.getName() + "=" + bs.get(p).toString();
                 }
-                int lightAtten = bs.isOpaqueCube(EmptyBlockReader.INSTANCE, BlockPos.ZERO) ? 15 : (bs.propagatesSkylightDown(EmptyBlockReader.INSTANCE, BlockPos.ZERO) ? 0 : 1);
+                int lightAtten = 15;
+                try {	// Workaround for mods with broken block state logic...
+                	lightAtten = bs.isOpaqueCube(EmptyBlockReader.INSTANCE, BlockPos.ZERO) ? 15 : (bs.propagatesSkylightDown(EmptyBlockReader.INSTANCE, BlockPos.ZERO) ? 0 : 1);
+                } catch (Exception x) {
+                	Log.warning(String.format("Exception while checking lighting data for block state: %s[%s]", bn, statename));
+                	Log.verboseinfo("Exception: " + x.toString());
+                }
                 //Log.info("statename=" + bn + "[" + statename + "], lightAtten=" + lightAtten);
                 // Fill in base attributes
                 bld.setBaseState(basebs).setStateIndex(idx - baseidx).setBlockName(bn).setStateName(statename).setMaterial(mat.toString()).setLegacyBlockID(idx).setAttenuatesLight(lightAtten);
@@ -1486,7 +1492,6 @@ public class DynmapPlugin
         core.setMinecraftVersion(mcver);
         core.setDataFolder(dataDirectory);
         core.setServer(fserver);
-        ForgeMapChunkCache.init();
         core.setTriggerDefault(TRIGGER_DEFAULTS);
         core.setBiomeNames(getBiomeNames());
 
@@ -1503,7 +1508,7 @@ public class DynmapPlugin
     
     private static int test(CommandSource source) throws CommandSyntaxException
 	{
-        System.out.println(source.toString());
+    	Log.warning(source.toString());
 		return 1;
     }
     
