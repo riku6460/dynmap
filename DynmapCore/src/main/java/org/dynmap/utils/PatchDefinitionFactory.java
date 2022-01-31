@@ -4,8 +4,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.dynmap.hdmap.TexturePack;
+import org.dynmap.modsupport.BlockSide;
+import org.dynmap.modsupport.ModelBlockModel;
 import org.dynmap.renderer.RenderPatch;
 import org.dynmap.renderer.RenderPatchFactory;
+import org.dynmap.renderer.RenderPatchFactory.SideVisible;
+import org.dynmap.Log;
 
 public class PatchDefinitionFactory implements RenderPatchFactory {
     private HashMap<PatchDefinition,PatchDefinition> patches = new HashMap<PatchDefinition,PatchDefinition>();
@@ -62,25 +66,56 @@ public class PatchDefinitionFactory implements RenderPatchFactory {
         }
 
     }
+    
+    public PatchDefinition getModelFace(double[] from, double[] to, BlockSide face, double[] uv, ModelBlockModel.SideRotation rot, int textureid) {
+        synchronized(lock) {
+            lookup.updateModelFace(from, to, face, uv, rot, textureid);
+            if(lookup.validate() == false)
+                return null;
+            PatchDefinition pd2 = patches.get(lookup);  /* See if in cache already */
+            if(pd2 == null) {
+                PatchDefinition pd = new PatchDefinition(lookup);
+                patches.put(pd,  pd);
+                pd2 = pd;
+            }
+            return pd2;
+        }    	
+    }
+    
+    @Override
+    public RenderPatch getRotatedPatch(RenderPatch patch, double xrot, double yrot,
+            double zrot, int textureindex) {
+        return getPatch((PatchDefinition)patch, xrot, yrot, zrot, textureindex);
+    }
+    @Override
+    public RenderPatch getRotatedPatch(RenderPatch patch, double xrot, double yrot,
+            double zrot, double rotorigx, double rotorigy, double rotorigz, int textureindex) {
+        return getPatch((PatchDefinition)patch, xrot, yrot, zrot, 
+        		new Vector3D(rotorigx, rotorigy, rotorigz), textureindex);
+    }
     @Override
     public RenderPatch getRotatedPatch(RenderPatch patch, int xrot, int yrot,
             int zrot, int textureindex) {
         return getPatch((PatchDefinition)patch, xrot, yrot, zrot, textureindex);
     }
-    
-    public PatchDefinition getPatch(PatchDefinition patch, int xrot, int yrot,
-            int zrot, int textureindex) {
-        PatchDefinition pd = new PatchDefinition(patch, xrot, yrot, zrot, textureindex);
-        if(pd.validate() == false)
+
+    public PatchDefinition getPatch(PatchDefinition patch, double xrot, double yrot,
+            double zrot, Vector3D rotorig, int textureindex) {
+        PatchDefinition pd = new PatchDefinition((PatchDefinition)patch, xrot, yrot, zrot, rotorig, textureindex);
+        if (pd.validate() == false)
             return null;
         synchronized(lock) {
             PatchDefinition pd2 = patches.get(pd);  /* See if in cache already */
-            if(pd2 == null) {
+            if (pd2 == null) {
                 patches.put(pd,  pd);
                 pd2 = pd;
             }
             return pd2;
         }
+    }
+    public PatchDefinition getPatch(PatchDefinition patch, double xrot, double yrot,
+            double zrot, int textureindex) {
+    	return getPatch(patch, xrot, yrot, zrot, null, textureindex);
     }
     /**
      * Get named patch with given attributes.  Name can encode rotation and patch index info
@@ -163,4 +198,42 @@ public class PatchDefinitionFactory implements RenderPatchFactory {
         return TexturePack.getTextureMapLength(id);
     }
     
+    public static void main(String[] args) {
+    	PatchDefinitionFactory fact = new PatchDefinitionFactory();
+    	PatchDefinition pd;
+    	BlockSide[] faces = { BlockSide.NORTH, BlockSide.EAST, BlockSide.SOUTH, BlockSide.WEST, BlockSide.TOP, BlockSide.BOTTOM };
+    	// campfire log:box=1/0/0:5/4/16:n/0/0/4/4/8:e/0/0/1/16/5:s/0/0/4/4/8:w/0/16/0/0/4:u90/0/0/0/16/4:d90/0/0/0/16/4
+    	double[][] uvs = { { 0, 4, 4, 8 }, { 0, 1, 16, 5 }, { 0, 4, 4, 8 }, { 16, 0, 0, 4 }, { 0, 0, 16, 4 }, { 0, 0, 16, 4 } };
+    	ModelBlockModel.SideRotation[] rots = { ModelBlockModel.SideRotation.DEG0, ModelBlockModel.SideRotation.DEG0, ModelBlockModel.SideRotation.DEG0,
+    	                                        ModelBlockModel.SideRotation.DEG0, ModelBlockModel.SideRotation.DEG90, ModelBlockModel.SideRotation.DEG90 };
+    	double[] from = { 1, 0, 0 };
+    	double[] to = { 5, 4, 16 };
+    	
+    	// Do normal faces, default limits
+    	pd = new PatchDefinition();
+    	for (int i = 0; i < faces.length; i++) {
+    		pd.updateModelFace(from,  to, faces[i], uvs[i], rots[i], 0);
+    		System.out.println("Log " + faces[i] + ": " + pd);
+    	}    	
+    	
+//    	// Do normal faces, default limits
+//    	pd = new PatchDefinition();
+//    	for (BlockSide face : faces) {
+//    		pd.updateModelFace(from,  to, face, null, 0);
+//    		System.out.println("Full cube " + face + ": " + pd);
+//    	}    	
+//    	
+//    	double[] toquarter = { 8,8,8 };
+//    	for (BlockSide face : faces) {
+//    		pd.updateModelFace(from,  toquarter, face, null, 0);
+//    		System.out.println("8x8x8 cube " + face + ": " + pd);
+//    	}    	
+//    	
+//
+//    	for (BlockSide face : faces) {
+//    		pd.updateModelFace(from,  toquarter, face, new double[] { 4, 4, 12, 12 }, 0);
+//    		System.out.println("Full cube, middle half of texture " + face + ": " + pd);
+//    	}    	
+
+    }
 }

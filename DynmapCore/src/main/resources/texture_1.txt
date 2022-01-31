@@ -88,6 +88,7 @@ texture:id=dropper_front
 texture:id=dropper_front_vertical
 texture:id=hopper_inside
 texture:id=hopper_outside
+texture:id=smooth_stone
 texture:id=black_terracotta
 texture:id=blue_terracotta
 texture:id=brown_terracotta
@@ -450,6 +451,7 @@ texture:id=spruce_door_bottom
 texture:id=spruce_door_top
 texture:id=observer_front
 texture:id=observer_back
+texture:id=observer_back_on
 texture:id=observer_side
 texture:id=observer_top
 texture:id=end_rod
@@ -879,7 +881,7 @@ block:id=obsidian,allfaces=0:obsidian,stdrot=true
 # Torch
 block:id=torch,patch0=0:torch,transparency=TRANSPARENT
 # Wall torch
-block:id=wall_torch,data=0,data=1,data=2,data=3,patch0=0:torch,transparency=TRANSPARENT
+block:id=wall_torch,data=*,patch0=0:torch,transparency=TRANSPARENT
 # Fire
 block:id=fire,patch0-3=0:fire_0,patch4-7=0:fire_1,transparency=TRANSPARENT
 # Monster spawner
@@ -959,7 +961,7 @@ block:id=ladder,patch0=0:ladder,transparency=TRANSPARENT
 # Cobblestone Stairs
 block:id=cobblestone_stairs,patch0-2=0:cobblestone,transparency=SEMITRANSPARENT
 # Lever
-block:id=lever,patch0-4=0:cobblestone,patch5-8=0:lever,transparency=TRANSPARENT
+block:id=lever,patch0=0:cobblestone,patch1=0:lever,transparency=TRANSPARENT
 # Stone pressure plate
 block:id=stone_pressure_plate,allfaces=0:stone,stdrot=true,transparency=TRANSPARENT
 # Iron Door
@@ -1032,23 +1034,9 @@ block:id=jack_o_lantern,data=2,face4=0:jack_o_lantern,face2=0:pumpkin_side,face3
 # Jack-O-Lantern (east)
 block:id=jack_o_lantern,data=3,face5=0:jack_o_lantern,face2=0:pumpkin_side,face3=0:pumpkin_side,face4=0:pumpkin_side,topbottom=6000:pumpkin_top,stdrot=true
 # Cake Block
-block:id=cake,allsides=0:cake_side,top=0:cake_top,bottom=0:cake_bottom,stdrot=true,transparency=TRANSPARENT
-# Repeater (on) facing east
-block:id=repeater,data=0,data=2,data=16,data=18,data=32,data=34,data=48,data=50,top=6000:repeater_on,allsides=0:stone,bottom=0:stone,transparency=TRANSPARENT
-# Repeater (off) facing east
-block:id=repeater,data=1,data=3,data=17,data=19,data=33,data=35,data=49,data=51,top=6000:repeater,allsides=0:stone,bottom=0:stone,transparency=TRANSPARENT
-# Repeater (on) facing south
-block:id=repeater,data=4,data=6,data=20,data=22,data=36,data=38,data=52,data=54,,top=5000:repeater_on,allsides=0:stone,bottom=0:stone,transparency=TRANSPARENT
-# Repeater (off) facing south
-block:id=repeater,data=5,data=7,data=21,data=23,data=37,data=39,data=53,data=55,top=5000:repeater,allsides=0:stone,bottom=0:stone,transparency=TRANSPARENT
-# Repeater (on) facing west
-block:id=repeater,data=8,data=10,data=24,data=26,data=40,data=42,data=56,data=58,top=4000:repeater_on,allsides=0:stone,bottom=0:stone,transparency=TRANSPARENT
-# Repeater (off) facing west
-block:id=repeater,data=9,data=11,data=25,data=27,data=41,data=43,data=57,data=59,top=4000:repeater,allsides=0:stone,bottom=0:stone,transparency=TRANSPARENT
-# Repeater (on) facing north
-block:id=repeater,data=12,data=14,data=28,data=30,data=44,data=46,data=60,data=62,top=0:repeater_on,allsides=0:stone,bottom=0:stone,transparency=TRANSPARENT
-# Repeater (off) facing north
-block:id=repeater,data=13,data=15,data=29,data=31,data=45,data=47,data=61,data=63,top=0:repeater,allsides=0:stone,bottom=0:stone,transparency=TRANSPARENT
+block:id=cake,patch0=0:cake_bottom,patch1=0:cake_top,patch2=0:cake_side,patch3=0:cake_inner,transparency=TRANSPARENT
+# Repeater
+block:id=repeater,data=*,patch0=0:smooth_stone,patch1=0:repeater,patch2=0:redstone_torch_off,patch3=0:redstone_torch,patch4=0:bedrock,patch5=0:repeater_on,transparency=TRANSPARENT
 # Stained Glass (95)
 block:id=white_stained_glass,allfaces=12000:white_stained_glass,stdrot=true,transparency=TRANSPARENT
 block:id=orange_stained_glass,allfaces=12000:orange_stained_glass,stdrot=true,transparency=TRANSPARENT
@@ -1358,16 +1346,8 @@ block:id=light_weighted_pressure_plate,allfaces=0:gold_block,stdrot=true,transpa
 # Heavy weighted pressure plate
 block:id=heavy_weighted_pressure_plate,allfaces=0:iron_block,stdrot=true,transparency=TRANSPARENT
 
-# Redstone Comparator (active)
-block:id=comparator,data=0,data=2,top=6000:comparator_on,allsides=0:stone,bottom=0:stone,transparency=TRANSPARENT
-block:id=comparator,data=4,data=6,top=5000:comparator_on,allsides=0:stone,bottom=0:stone,transparency=TRANSPARENT
-block:id=comparator,data=8,data=10,top=4000:comparator_on,allsides=0:stone,bottom=0:stone,transparency=TRANSPARENT
-block:id=comparator,data=12,data=14,top=0:comparator_on,allsides=0:stone,bottom=0:stone,transparency=TRANSPARENT
-# Redstone Comparator (inactive)
-block:id=comparator,data=1,data=3,top=6000:comparator,allsides=0:stone,bottom=0:stone,transparency=TRANSPARENT
-block:id=comparator,data=5,data=7,top=5000:comparator,allsides=0:stone,bottom=0:stone,transparency=TRANSPARENT
-block:id=comparator,data=9,data=11,top=4000:comparator,allsides=0:stone,bottom=0:stone,transparency=TRANSPARENT
-block:id=comparator,data=13,data=15,top=0:comparator,allsides=0:stone,bottom=0:stone,transparency=TRANSPARENT
+# Comparator (on)
+block:id=comparator,data=*,patch0=0:smooth_stone,patch1=0:comparator,patch2=0:redstone_torch_off,patch3=0:redstone_torch,patch4=0:comparator_on,transparency=TRANSPARENT
 
 # Daylight Sensor
 # Inverted Daylight Sensor
@@ -1675,13 +1655,9 @@ block:id=structure_block,data=3,stdrot=true,allfaces=0:structure_block_data
 # Structure void
 block:id=structure_void,transparency=TRANSPARENT
 
-# Observer Block
-block:id=observer,data=0-1,top=4000:observer_back,east=0:observer_top,south=4000:observer_side,north=4000:observer_side,west=0:observer_top,bottom=4000:observer_front
-block:id=observer,data=2-3,top=4000:observer_front,east=5000:observer_top,south=4000:observer_side,north=4000:observer_side,west=5000:observer_top,bottom=4000:observer_back
-block:id=observer,data=4-5,top=4000:observer_top,east=0:observer_front,south=0:observer_side,north=0:observer_side,west=0:observer_back,bottom=4000:observer_top
-block:id=observer,data=6-7,top=6000:observer_top,east=0:observer_back,south=0:observer_side,north=0:observer_side,west=0:observer_front,bottom=6000:observer_top
-block:id=observer,data=8-9,top=5000:observer_top,east=0:observer_side,south=0:observer_back,north=0:observer_front,west=0:observer_side,bottom=5000:observer_top
-block:id=observer,data=10-11,top=0:observer_top,east=0:observer_side,south=0:observer_front,north=0:observer_back,west=0:observer_side,bottom=0:observer_top
+# Observer Block (top, front, bottom, side)
+block:id=observer,data=0,data=2,data=4,data=6,data=8,data=10,patch0=0:observer_top,patch1=0:observer_front,patch2=0:observer_back_on,patch3=0:observer_side
+block:id=observer,data=1,data=3,data=5,data=7,data=9,data=11,patch0=0:observer_top,patch1=0:observer_front,patch2=0:observer_back,patch3=0:observer_side
 
 # Shulker Blocks (facing bottom)
 block:id=shulker_box,data=0,top=4005,bottom=0,south=5004,north=5002,east=5003,west=5001,txtid=shulker
@@ -1799,71 +1775,22 @@ block:id=black_shulker_box,data=5,top=5001,bottom=5002,south=0,north=7005,east=6
 
 
 # Glazed Terracotta
-block:id=white_glazed_terracotta,data=0,stdrot=true,topbottom=0:white_glazed_terracotta,north=0:white_glazed_terracotta,south=5000:white_glazed_terracotta,west=4000:white_glazed_terracotta,east=6000:white_glazed_terracotta
-block:id=white_glazed_terracotta,data=1,stdrot=true,topbottom=6000:white_glazed_terracotta,east=0:white_glazed_terracotta,west=5000:white_glazed_terracotta,north=4000:white_glazed_terracotta,south=6000:white_glazed_terracotta
-block:id=white_glazed_terracotta,data=2,stdrot=true,topbottom=5000:white_glazed_terracotta,south=0:white_glazed_terracotta,north=5000:white_glazed_terracotta,east=4000:white_glazed_terracotta,west=6000:white_glazed_terracotta
-block:id=white_glazed_terracotta,data=3,stdrot=true,topbottom=4000:white_glazed_terracotta,west=0:white_glazed_terracotta,east=5000:white_glazed_terracotta,south=4000:white_glazed_terracotta,north=6000:white_glazed_terracotta
-block:id=orange_glazed_terracotta,data=0,stdrot=true,topbottom=0:orange_glazed_terracotta,north=0:orange_glazed_terracotta,south=5000:orange_glazed_terracotta,west=4000:orange_glazed_terracotta,east=6000:orange_glazed_terracotta
-block:id=orange_glazed_terracotta,data=1,stdrot=true,topbottom=6000:orange_glazed_terracotta,east=0:orange_glazed_terracotta,west=5000:orange_glazed_terracotta,north=4000:orange_glazed_terracotta,south=6000:orange_glazed_terracotta
-block:id=orange_glazed_terracotta,data=2,stdrot=true,topbottom=5000:orange_glazed_terracotta,south=0:orange_glazed_terracotta,north=5000:orange_glazed_terracotta,east=4000:orange_glazed_terracotta,west=6000:orange_glazed_terracotta
-block:id=orange_glazed_terracotta,data=3,stdrot=true,topbottom=4000:orange_glazed_terracotta,west=0:orange_glazed_terracotta,east=5000:orange_glazed_terracotta,south=4000:orange_glazed_terracotta,north=6000:orange_glazed_terracotta
-block:id=magenta_glazed_terracotta,data=0,stdrot=true,topbottom=0:magenta_glazed_terracotta,north=0:magenta_glazed_terracotta,south=5000:magenta_glazed_terracotta,west=4000:magenta_glazed_terracotta,east=6000:magenta_glazed_terracotta
-block:id=magenta_glazed_terracotta,data=1,stdrot=true,topbottom=6000:magenta_glazed_terracotta,east=0:magenta_glazed_terracotta,west=5000:magenta_glazed_terracotta,north=4000:magenta_glazed_terracotta,south=6000:magenta_glazed_terracotta
-block:id=magenta_glazed_terracotta,data=2,stdrot=true,topbottom=5000:magenta_glazed_terracotta,south=0:magenta_glazed_terracotta,north=5000:magenta_glazed_terracotta,east=4000:magenta_glazed_terracotta,west=6000:magenta_glazed_terracotta
-block:id=magenta_glazed_terracotta,data=3,stdrot=true,topbottom=4000:magenta_glazed_terracotta,west=0:magenta_glazed_terracotta,east=5000:magenta_glazed_terracotta,south=4000:magenta_glazed_terracotta,north=6000:magenta_glazed_terracotta
-block:id=light_blue_glazed_terracotta,data=0,stdrot=true,topbottom=0:light_blue_glazed_terracotta,north=0:light_blue_glazed_terracotta,south=5000:light_blue_glazed_terracotta,west=4000:light_blue_glazed_terracotta,east=6000:light_blue_glazed_terracotta
-block:id=light_blue_glazed_terracotta,data=1,stdrot=true,topbottom=6000:light_blue_glazed_terracotta,east=0:light_blue_glazed_terracotta,west=5000:light_blue_glazed_terracotta,north=4000:light_blue_glazed_terracotta,south=6000:light_blue_glazed_terracotta
-block:id=light_blue_glazed_terracotta,data=2,stdrot=true,topbottom=5000:light_blue_glazed_terracotta,south=0:light_blue_glazed_terracotta,north=5000:light_blue_glazed_terracotta,east=4000:light_blue_glazed_terracotta,west=6000:light_blue_glazed_terracotta
-block:id=light_blue_glazed_terracotta,data=3,stdrot=true,topbottom=4000:light_blue_glazed_terracotta,west=0:light_blue_glazed_terracotta,east=5000:light_blue_glazed_terracotta,south=4000:light_blue_glazed_terracotta,north=6000:light_blue_glazed_terracotta
-block:id=yellow_glazed_terracotta,data=0,stdrot=true,topbottom=0:yellow_glazed_terracotta,north=0:yellow_glazed_terracotta,south=5000:yellow_glazed_terracotta,west=4000:yellow_glazed_terracotta,east=6000:yellow_glazed_terracotta
-block:id=yellow_glazed_terracotta,data=1,stdrot=true,topbottom=6000:yellow_glazed_terracotta,east=0:yellow_glazed_terracotta,west=5000:yellow_glazed_terracotta,north=4000:yellow_glazed_terracotta,south=6000:yellow_glazed_terracotta
-block:id=yellow_glazed_terracotta,data=2,stdrot=true,topbottom=5000:yellow_glazed_terracotta,south=0:yellow_glazed_terracotta,north=5000:yellow_glazed_terracotta,east=4000:yellow_glazed_terracotta,west=6000:yellow_glazed_terracotta
-block:id=yellow_glazed_terracotta,data=3,stdrot=true,topbottom=4000:yellow_glazed_terracotta,west=0:yellow_glazed_terracotta,east=5000:yellow_glazed_terracotta,south=4000:yellow_glazed_terracotta,north=6000:yellow_glazed_terracotta
-block:id=lime_glazed_terracotta,data=0,stdrot=true,topbottom=0:lime_glazed_terracotta,north=0:lime_glazed_terracotta,south=5000:lime_glazed_terracotta,west=4000:lime_glazed_terracotta,east=6000:lime_glazed_terracotta
-block:id=lime_glazed_terracotta,data=1,stdrot=true,topbottom=6000:lime_glazed_terracotta,east=0:lime_glazed_terracotta,west=5000:lime_glazed_terracotta,north=4000:lime_glazed_terracotta,south=6000:lime_glazed_terracotta
-block:id=lime_glazed_terracotta,data=2,stdrot=true,topbottom=5000:lime_glazed_terracotta,south=0:lime_glazed_terracotta,north=5000:lime_glazed_terracotta,east=4000:lime_glazed_terracotta,west=6000:lime_glazed_terracotta
-block:id=lime_glazed_terracotta,data=3,stdrot=true,topbottom=4000:lime_glazed_terracotta,west=0:lime_glazed_terracotta,east=5000:lime_glazed_terracotta,south=4000:lime_glazed_terracotta,north=6000:lime_glazed_terracotta
-block:id=pink_glazed_terracotta,data=0,stdrot=true,topbottom=0:pink_glazed_terracotta,north=0:pink_glazed_terracotta,south=5000:pink_glazed_terracotta,west=4000:pink_glazed_terracotta,east=6000:pink_glazed_terracotta
-block:id=pink_glazed_terracotta,data=1,stdrot=true,topbottom=6000:pink_glazed_terracotta,east=0:pink_glazed_terracotta,west=5000:pink_glazed_terracotta,north=4000:pink_glazed_terracotta,south=6000:pink_glazed_terracotta
-block:id=pink_glazed_terracotta,data=2,stdrot=true,topbottom=5000:pink_glazed_terracotta,south=0:pink_glazed_terracotta,north=5000:pink_glazed_terracotta,east=4000:pink_glazed_terracotta,west=6000:pink_glazed_terracotta
-block:id=pink_glazed_terracotta,data=3,stdrot=true,topbottom=4000:pink_glazed_terracotta,west=0:pink_glazed_terracotta,east=5000:pink_glazed_terracotta,south=4000:pink_glazed_terracotta,north=6000:pink_glazed_terracotta
-block:id=gray_glazed_terracotta,data=0,stdrot=true,topbottom=0:gray_glazed_terracotta,north=0:gray_glazed_terracotta,south=5000:gray_glazed_terracotta,west=4000:gray_glazed_terracotta,east=6000:gray_glazed_terracotta
-block:id=gray_glazed_terracotta,data=1,stdrot=true,topbottom=6000:gray_glazed_terracotta,east=0:gray_glazed_terracotta,west=5000:gray_glazed_terracotta,north=4000:gray_glazed_terracotta,south=6000:gray_glazed_terracotta
-block:id=gray_glazed_terracotta,data=2,stdrot=true,topbottom=5000:gray_glazed_terracotta,south=0:gray_glazed_terracotta,north=5000:gray_glazed_terracotta,east=4000:gray_glazed_terracotta,west=6000:gray_glazed_terracotta
-block:id=gray_glazed_terracotta,data=3,stdrot=true,topbottom=4000:gray_glazed_terracotta,west=0:gray_glazed_terracotta,east=5000:gray_glazed_terracotta,south=4000:gray_glazed_terracotta,north=6000:gray_glazed_terracotta
-block:id=light_gray_glazed_terracotta,data=0,stdrot=true,topbottom=0:light_gray_glazed_terracotta,north=0:light_gray_glazed_terracotta,south=5000:light_gray_glazed_terracotta,west=4000:light_gray_glazed_terracotta,east=6000:light_gray_glazed_terracotta
-block:id=light_gray_glazed_terracotta,data=1,stdrot=true,topbottom=6000:light_gray_glazed_terracotta,east=0:light_gray_glazed_terracotta,west=5000:light_gray_glazed_terracotta,north=4000:light_gray_glazed_terracotta,south=6000:light_gray_glazed_terracotta
-block:id=light_gray_glazed_terracotta,data=2,stdrot=true,topbottom=5000:light_gray_glazed_terracotta,south=0:light_gray_glazed_terracotta,north=5000:light_gray_glazed_terracotta,east=4000:light_gray_glazed_terracotta,west=6000:light_gray_glazed_terracotta
-block:id=light_gray_glazed_terracotta,data=3,stdrot=true,topbottom=4000:light_gray_glazed_terracotta,west=0:light_gray_glazed_terracotta,east=5000:light_gray_glazed_terracotta,south=4000:light_gray_glazed_terracotta,north=6000:light_gray_glazed_terracotta
-block:id=cyan_glazed_terracotta,data=0,stdrot=true,topbottom=0:cyan_glazed_terracotta,north=0:cyan_glazed_terracotta,south=5000:cyan_glazed_terracotta,west=4000:cyan_glazed_terracotta,east=6000:cyan_glazed_terracotta
-block:id=cyan_glazed_terracotta,data=1,stdrot=true,topbottom=6000:cyan_glazed_terracotta,east=0:cyan_glazed_terracotta,west=5000:cyan_glazed_terracotta,north=4000:cyan_glazed_terracotta,south=6000:cyan_glazed_terracotta
-block:id=cyan_glazed_terracotta,data=2,stdrot=true,topbottom=5000:cyan_glazed_terracotta,south=0:cyan_glazed_terracotta,north=5000:cyan_glazed_terracotta,east=4000:cyan_glazed_terracotta,west=6000:cyan_glazed_terracotta
-block:id=cyan_glazed_terracotta,data=3,stdrot=true,topbottom=4000:cyan_glazed_terracotta,west=0:cyan_glazed_terracotta,east=5000:cyan_glazed_terracotta,south=4000:cyan_glazed_terracotta,north=6000:cyan_glazed_terracotta
-block:id=purple_glazed_terracotta,data=0,stdrot=true,topbottom=0:purple_glazed_terracotta,north=0:purple_glazed_terracotta,south=5000:purple_glazed_terracotta,west=4000:purple_glazed_terracotta,east=6000:purple_glazed_terracotta
-block:id=purple_glazed_terracotta,data=1,stdrot=true,topbottom=6000:purple_glazed_terracotta,east=0:purple_glazed_terracotta,west=5000:purple_glazed_terracotta,north=4000:purple_glazed_terracotta,south=6000:purple_glazed_terracotta
-block:id=purple_glazed_terracotta,data=2,stdrot=true,topbottom=5000:purple_glazed_terracotta,south=0:purple_glazed_terracotta,north=5000:purple_glazed_terracotta,east=4000:purple_glazed_terracotta,west=6000:purple_glazed_terracotta
-block:id=purple_glazed_terracotta,data=3,stdrot=true,topbottom=4000:purple_glazed_terracotta,west=0:purple_glazed_terracotta,east=5000:purple_glazed_terracotta,south=4000:purple_glazed_terracotta,north=6000:purple_glazed_terracotta
-block:id=blue_glazed_terracotta,data=0,stdrot=true,topbottom=0:blue_glazed_terracotta,north=0:blue_glazed_terracotta,south=5000:blue_glazed_terracotta,west=4000:blue_glazed_terracotta,east=6000:blue_glazed_terracotta
-block:id=blue_glazed_terracotta,data=1,stdrot=true,topbottom=6000:blue_glazed_terracotta,east=0:blue_glazed_terracotta,west=5000:blue_glazed_terracotta,north=4000:blue_glazed_terracotta,south=6000:blue_glazed_terracotta
-block:id=blue_glazed_terracotta,data=2,stdrot=true,topbottom=5000:blue_glazed_terracotta,south=0:blue_glazed_terracotta,north=5000:blue_glazed_terracotta,east=4000:blue_glazed_terracotta,west=6000:blue_glazed_terracotta
-block:id=blue_glazed_terracotta,data=3,stdrot=true,topbottom=4000:blue_glazed_terracotta,west=0:blue_glazed_terracotta,east=5000:blue_glazed_terracotta,south=4000:blue_glazed_terracotta,north=6000:blue_glazed_terracotta
-block:id=brown_glazed_terracotta,data=0,stdrot=true,topbottom=0:brown_glazed_terracotta,north=0:brown_glazed_terracotta,south=5000:brown_glazed_terracotta,west=4000:brown_glazed_terracotta,east=6000:brown_glazed_terracotta
-block:id=brown_glazed_terracotta,data=1,stdrot=true,topbottom=6000:brown_glazed_terracotta,east=0:brown_glazed_terracotta,west=5000:brown_glazed_terracotta,north=4000:brown_glazed_terracotta,south=6000:brown_glazed_terracotta
-block:id=brown_glazed_terracotta,data=2,stdrot=true,topbottom=5000:brown_glazed_terracotta,south=0:brown_glazed_terracotta,north=5000:brown_glazed_terracotta,east=4000:brown_glazed_terracotta,west=6000:brown_glazed_terracotta
-block:id=brown_glazed_terracotta,data=3,stdrot=true,topbottom=4000:brown_glazed_terracotta,west=0:brown_glazed_terracotta,east=5000:brown_glazed_terracotta,south=4000:brown_glazed_terracotta,north=6000:brown_glazed_terracotta
-block:id=green_glazed_terracotta,data=0,stdrot=true,topbottom=0:green_glazed_terracotta,north=0:green_glazed_terracotta,south=5000:green_glazed_terracotta,west=4000:green_glazed_terracotta,east=6000:green_glazed_terracotta
-block:id=green_glazed_terracotta,data=1,stdrot=true,topbottom=6000:green_glazed_terracotta,east=0:green_glazed_terracotta,west=5000:green_glazed_terracotta,north=4000:green_glazed_terracotta,south=6000:green_glazed_terracotta
-block:id=green_glazed_terracotta,data=2,stdrot=true,topbottom=5000:green_glazed_terracotta,south=0:green_glazed_terracotta,north=5000:green_glazed_terracotta,east=4000:green_glazed_terracotta,west=6000:green_glazed_terracotta
-block:id=green_glazed_terracotta,data=3,stdrot=true,topbottom=4000:green_glazed_terracotta,west=0:green_glazed_terracotta,east=5000:green_glazed_terracotta,south=4000:green_glazed_terracotta,north=6000:green_glazed_terracotta
-block:id=red_glazed_terracotta,data=0,stdrot=true,topbottom=0:red_glazed_terracotta,north=0:red_glazed_terracotta,south=5000:red_glazed_terracotta,west=4000:red_glazed_terracotta,east=6000:red_glazed_terracotta
-block:id=red_glazed_terracotta,data=1,stdrot=true,topbottom=6000:red_glazed_terracotta,east=0:red_glazed_terracotta,west=5000:red_glazed_terracotta,north=4000:red_glazed_terracotta,south=6000:red_glazed_terracotta
-block:id=red_glazed_terracotta,data=2,stdrot=true,topbottom=5000:red_glazed_terracotta,south=0:red_glazed_terracotta,north=5000:red_glazed_terracotta,east=4000:red_glazed_terracotta,west=6000:red_glazed_terracotta
-block:id=red_glazed_terracotta,data=3,stdrot=true,topbottom=4000:red_glazed_terracotta,west=0:red_glazed_terracotta,east=5000:red_glazed_terracotta,south=4000:red_glazed_terracotta,north=6000:red_glazed_terracotta
-block:id=black_glazed_terracotta,data=0,stdrot=true,topbottom=0:black_glazed_terracotta,north=0:black_glazed_terracotta,south=5000:black_glazed_terracotta,west=4000:black_glazed_terracotta,east=6000:black_glazed_terracotta
-block:id=black_glazed_terracotta,data=1,stdrot=true,topbottom=6000:black_glazed_terracotta,east=0:black_glazed_terracotta,west=5000:black_glazed_terracotta,north=4000:black_glazed_terracotta,south=6000:black_glazed_terracotta
-block:id=black_glazed_terracotta,data=2,stdrot=true,topbottom=5000:black_glazed_terracotta,south=0:black_glazed_terracotta,north=5000:black_glazed_terracotta,east=4000:black_glazed_terracotta,west=6000:black_glazed_terracotta
-block:id=black_glazed_terracotta,data=3,stdrot=true,topbottom=4000:black_glazed_terracotta,west=0:black_glazed_terracotta,east=5000:black_glazed_terracotta,south=4000:black_glazed_terracotta,north=6000:black_glazed_terracotta
-
+block:id=white_glazed_terracotta,data=*,patch0=0:white_glazed_terracotta
+block:id=orange_glazed_terracotta,data=*,patch0=0:orange_glazed_terracotta
+block:id=magenta_glazed_terracotta,data=*,patch0=0:magenta_glazed_terracotta
+block:id=light_blue_glazed_terracotta,data=*,patch0=0:light_blue_glazed_terracotta
+block:id=yellow_glazed_terracotta,data=*,patch0=0:yellow_glazed_terracotta
+block:id=lime_glazed_terracotta,data=*,patch0=0:lime_glazed_terracotta
+block:id=pink_glazed_terracotta,data=*,patch0=0:pink_glazed_terracotta
+block:id=gray_glazed_terracotta,data=*,patch0=0:gray_glazed_terracotta
+block:id=light_gray_glazed_terracotta,data=*,patch0=0:light_gray_glazed_terracotta
+block:id=cyan_glazed_terracotta,data=*,patch0=0:cyan_glazed_terracotta
+block:id=purple_glazed_terracotta,data=*,patch0=0:purple_glazed_terracotta
+block:id=blue_glazed_terracotta,data=*,patch0=0:blue_glazed_terracotta
+block:id=brown_glazed_terracotta,data=*,patch0=0:brown_glazed_terracotta
+block:id=green_glazed_terracotta,data=*,patch0=0:green_glazed_terracotta
+block:id=red_glazed_terracotta,data=*,patch0=0:red_glazed_terracotta
+block:id=black_glazed_terracotta,data=*,patch0=0:black_glazed_terracotta
 # Concrete
 block:id=white_concrete,stdrot=true,allfaces=0:white_concrete
 block:id=orange_concrete,stdrot=true,allfaces=0:orange_concrete
@@ -2132,7 +2059,6 @@ block:id=black_banner,id=black_wall_banner,data=*,patch0=0:oak_planks,patch1=0:b
 [1.14-]texture:id=wither_rose
 [1.14-]texture:id=lily_of_the_valley
 [1.14-]texture:id=smooth_stone_slab_side
-[1.14-]texture:id=smooth_stone
 [1.14-]texture:id=bamboo_stage0
 [1.14-]texture:id=bamboo_stalk
 [1.14-]texture:id=scaffolding_top
@@ -2367,7 +2293,7 @@ block:id=black_banner,id=black_wall_banner,data=*,patch0=0:oak_planks,patch1=0:b
 # Stonecutter
 [1.14-]block:id=stonecutter,patch0=0:stonecutter_bottom,patch1=0:stonecutter_top,patch2=0:stonecutter_side,patch3=0:stonecutter_saw,transparency=TRANSPARENT
 # Campfire
-[1.14-]block:id=campfire,patch0=0:campfire_log,patch1=0:campfire_log_lit,patch2=0:campfire_fire,transparency=TRANSPARENT
+[1.14-]block:id=campfire,data=*,patch0=0:campfire_log,patch1=0:campfire_log_lit,patch2=0:campfire_fire,transparency=TRANSPARENT
 # Bell
 [1.14-]block:id=bell,patch0=0:dark_oak_planks,patch1=0:stone,patch2=0:bell_bottom,patch3=0:bell_top,patch4=0:bell_side,transparency=TRANSPARENT
 
@@ -2496,7 +2422,7 @@ block:id=black_banner,id=black_wall_banner,data=*,patch0=0:oak_planks,patch1=0:b
 [1.16-]block:id=soul_lantern,patch0=0:soul_lantern,transparency=TRANSPARENT
 [1.16-]block:id=soul_lantern,patch0=0:soul_lantern,patch1=1:soul_lantern,patch2=2:soul_lantern,patch3=3:soul_lantern,patch4=4:soul_lantern,patch5=5:soul_lantern,patch6=6:soul_lantern,patch7=7:soul_lantern,transparency=TRANSPARENT
 # Soul Campfire
-[1.16-]block:id=soul_campfire,patch0=0:campfire_log,patch1=0:soul_campfire_log_lit,patch2=0:soul_campfire_fire,transparency=TRANSPARENT
+[1.16-]block:id=soul_campfire,data=*,patch0=0:campfire_log,patch1=0:soul_campfire_log_lit,patch2=0:soul_campfire_fire,transparency=TRANSPARENT
 # Warped Stem
 [1.16-]block:id=warped_stem,data=1,allsides=0:warped_stem,topbottom=0:warped_stem_top,stdrot=true
 [1.16-]block:id=warped_stem,data=0,north=0:warped_stem_top,south=0:warped_stem_top,east=4000:warped_stem,west=4000:warped_stem,top=0:warped_stem,bottom=0:warped_stem
@@ -2837,9 +2763,9 @@ block:id=black_banner,id=black_wall_banner,data=*,patch0=0:oak_planks,patch1=0:b
 # Deepslate copper ore
 [1.17-]block:id=deepslate_copper_ore,allfaces=0:deepslate_copper_ore,stdrot=true
 # Leaves (azalea)
-[1.17-]block:id=azalea_leaves,allfaces=2000:azalea_leaves,stdrot=true,transparency=LEAVES
+[1.17-]block:id=azalea_leaves,allfaces=0:azalea_leaves,stdrot=true,transparency=TRANSPARENT
 # Leaves (flowering azalea)
-[1.17-]block:id=flowering_azalea_leaves,allfaces=2000:flowering_azalea_leaves,stdrot=true,transparency=LEAVES
+[1.17-]block:id=flowering_azalea_leaves,allfaces=0:flowering_azalea_leaves,stdrot=true,transparency=TRANSPARENT
 # Glow lichens
 [1.17-]block:id=glow_lichen,patch0-4=0:glow_lichen,transparency=TRANSPARENT
 # Calcite
@@ -3149,16 +3075,18 @@ block:id=black_banner,id=black_wall_banner,data=*,patch0=0:oak_planks,patch1=0:b
 [1.17-]block:id=powder_snow_cauldron,data=*,top=0:cauldron_top,bottom=0:cauldron_bottom,allsides=0:cauldron_side,stdrot=true,transparency=TRANSPARENT
 # Budding amethyst
 [1.17-]block:id=budding_amethyst,allfaces=0:budding_amethyst,stdrot=true
-# Sculk Sensor
+# Sculk Sensor (sculk_sensor_bottom, sculk_sensor_side, sculk_sensor_tendril_inactive/active, sculk_sensor_top)
 [1.17-]texture:id=sculk_sensor_side
 [1.17-]texture:id=sculk_sensor_bottom
 [1.17-]texture:id=sculk_sensor_top
 [1.17-]texture:id=sculk_sensor_tendril_inactive
 [1.17-]texture:id=sculk_sensor_tendril_active
-
-[1.17-]block:id=%sculk_sensor,data=0,data=1,data=6,data=7,data=12,data=13,patch0=0:sculk_sensor_side,patch1=0:sculk_sensor_side,patch2=0:sculk_sensor_bottom,patch3=0:sculk_sensor_side,patch4=0:sculk_sensor_side,patch5=0:sculk_sensor_top,patch6=0:sculk_sensor_tendril_inactive,patch7=0:sculk_sensor_tendril_inactive,patch8=0:sculk_sensor_tendril_inactive,patch9=0:sculk_sensor_tendril_inactive,patch10=0:sculk_sensor_tendril_inactive,patch11=0:sculk_sensor_tendril_inactive,patch12=0:sculk_sensor_tendril_inactive,patch13=0:sculk_sensor_tendril_inactive,transparency=SEMITRANSPARENT,stdrot=true
-[1.17-]block:id=%sculk_sensor,data=2,data=3,data=8,data=9,data=14,data=15,patch0=0:sculk_sensor_side,patch1=0:sculk_sensor_side,patch2=0:sculk_sensor_bottom,patch3=0:sculk_sensor_side,patch4=0:sculk_sensor_side,patch5=0:sculk_sensor_top,patch6=0:sculk_sensor_tendril_active,patch7=0:sculk_sensor_tendril_active,patch8=0:sculk_sensor_tendril_active,patch9=0:sculk_sensor_tendril_active,patch10=0:sculk_sensor_tendril_active,patch11=0:sculk_sensor_tendril_active,patch12=0:sculk_sensor_tendril_active,patch13=0:sculk_sensor_tendril_active,transparency=SEMITRANSPARENT,stdrot=true
-[1.17-]block:id=%sculk_sensor,data=4,data=5,data=10,data=11,patch0=0:sculk_sensor_side,patch1=0:sculk_sensor_side,patch2=0:sculk_sensor_bottom,patch3=0:sculk_sensor_side,patch4=0:sculk_sensor_side,patch5=0:sculk_sensor_top,patch6=0:sculk_sensor_tendril_inactive,patch7=0:sculk_sensor_tendril_inactive,patch8=0:sculk_sensor_tendril_inactive,patch9=0:sculk_sensor_tendril_inactive,patch10=0:sculk_sensor_tendril_inactive,patch11=0:sculk_sensor_tendril_inactive,patch12=0:sculk_sensor_tendril_inactive,patch13=0:sculk_sensor_tendril_inactive,transparency=SEMITRANSPARENT,stdrot=true
+# Sculk Sensor (inactive)
+[1.17-]block:id=sculk_sensor,data=0,data=1,data=6,data=7,data=10,data=11,data=14,data=15,data=18,data=19,data=22,data=23,data=26,data=27,data=30,data=31,data=34,data=35,data=38,data=39,data=42,data=43,data=46,data=47,data=50,data=51,data=54,data=55,data=58,data=59,data=62,data=63,data=66,data=67,data=70,data=71,data=74,data=75,data=78,data=79,data=82,data=83,data=86,data=87,data=90,data=91,patch0=0:sculk_sensor_bottom,patch1=0:sculk_sensor_side,patch2=0:sculk_sensor_tendril_inactive,patch3=0:sculk_sensor_top
+# Sculk Sensor (active)
+[1.17-]block:id=sculk_sensor,data=2,data=3,data=8,data=9,data=12,data=13,data=16,data=17,data=20,data=21,data=24,data=25,data=28,data=29,data=32,data=33,data=36,data=37,data=40,data=41,data=44,data=45,data=48,data=49,data=52,data=53,data=56,data=57,data=60,data=61,data=64,data=65,data=68,data=69,data=72,data=73,data=76,data=77,data=80,data=81,data=84,data=85,data=88,data=89,data=92,data=93,patch0=0:sculk_sensor_bottom,patch1=0:sculk_sensor_side,patch2=0:sculk_sensor_tendril_active,patch3=0:sculk_sensor_top
+# Sculk Sensor (cooldown)
+[1.17-]block:id=sculk_sensor,data=4,data=5,data=10,data=11,data=14,data=15,data=18,data=19,data=22,data=23,data=26,data=27,data=30,data=31,data=34,data=35,data=38,data=39,data=42,data=43,data=46,data=47,data=50,data=51,data=54,data=55,data=58,data=59,data=62,data=63,data=66,data=67,data=70,data=71,data=70,data=71,data=78,data=79,data=82,data=83,data=86,data=87,data=90,data=91,data=94,data=95,patch0=0:sculk_sensor_bottom,patch1=0:sculk_sensor_side,patch2=0:sculk_sensor_tendril_inactive,patch3=0:sculk_sensor_top
 # Spore blossom
 [1.17-]texture:id=spore_blossom_base
 [1.17-]texture:id=spore_blossom
