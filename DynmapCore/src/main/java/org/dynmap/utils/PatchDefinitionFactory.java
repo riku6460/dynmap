@@ -8,8 +8,6 @@ import org.dynmap.modsupport.BlockSide;
 import org.dynmap.modsupport.ModelBlockModel;
 import org.dynmap.renderer.RenderPatch;
 import org.dynmap.renderer.RenderPatchFactory;
-import org.dynmap.renderer.RenderPatchFactory.SideVisible;
-import org.dynmap.Log;
 
 public class PatchDefinitionFactory implements RenderPatchFactory {
     private HashMap<PatchDefinition,PatchDefinition> patches = new HashMap<PatchDefinition,PatchDefinition>();
@@ -66,10 +64,10 @@ public class PatchDefinitionFactory implements RenderPatchFactory {
         }
 
     }
-    
-    public PatchDefinition getModelFace(double[] from, double[] to, BlockSide face, double[] uv, ModelBlockModel.SideRotation rot, int textureid) {
+
+    public PatchDefinition getModelFace(double[] from, double[] to, BlockSide face, double[] uv, ModelBlockModel.SideRotation rot, boolean shade, int textureid) {
         synchronized(lock) {
-            lookup.updateModelFace(from, to, face, uv, rot, textureid);
+            lookup.updateModelFace(from, to, face, uv, rot, shade, textureid);
             if(lookup.validate() == false)
                 return null;
             PatchDefinition pd2 = patches.get(lookup);  /* See if in cache already */
@@ -198,24 +196,26 @@ public class PatchDefinitionFactory implements RenderPatchFactory {
         return TexturePack.getTextureMapLength(id);
     }
     
-    public static void main(String[] args) {
-    	PatchDefinitionFactory fact = new PatchDefinitionFactory();
-    	PatchDefinition pd;
-    	BlockSide[] faces = { BlockSide.NORTH, BlockSide.EAST, BlockSide.SOUTH, BlockSide.WEST, BlockSide.TOP, BlockSide.BOTTOM };
-    	// campfire log:box=1/0/0:5/4/16:n/0/0/4/4/8:e/0/0/1/16/5:s/0/0/4/4/8:w/0/16/0/0/4:u90/0/0/0/16/4:d90/0/0/0/16/4
-    	double[][] uvs = { { 0, 4, 4, 8 }, { 0, 1, 16, 5 }, { 0, 4, 4, 8 }, { 16, 0, 0, 4 }, { 0, 0, 16, 4 }, { 0, 0, 16, 4 } };
-    	ModelBlockModel.SideRotation[] rots = { ModelBlockModel.SideRotation.DEG0, ModelBlockModel.SideRotation.DEG0, ModelBlockModel.SideRotation.DEG0,
-    	                                        ModelBlockModel.SideRotation.DEG0, ModelBlockModel.SideRotation.DEG90, ModelBlockModel.SideRotation.DEG90 };
-    	double[] from = { 1, 0, 0 };
-    	double[] to = { 5, 4, 16 };
-    	
-    	// Do normal faces, default limits
-    	pd = new PatchDefinition();
-    	for (int i = 0; i < faces.length; i++) {
-    		pd.updateModelFace(from,  to, faces[i], uvs[i], rots[i], 0);
-    		System.out.println("Log " + faces[i] + ": " + pd);
-    	}    	
-    	
+//    public static void main(String[] args) {
+//    	PatchDefinition pd;
+//    	
+//    	// box=0.000000/3.000000/9.000000:2.000000/6.000000/13.000000:
+//    	// w/0/13.000000/7.000000/15.000000/10.000000:d/0/0.000000/9.000000/2.000000/13.000000:e/0/13.000000/7.000000/15.000000/10.000000:u/0/0.000000/9.000000/2.000000/13.000000:R/0/180/0
+//    	BlockSide[] faces = { BlockSide.WEST, BlockSide.BOTTOM, BlockSide.EAST, BlockSide.TOP };
+//    	// campfire log:box=1/0/0:5/4/16:n/0/0/4/4/8:e/0/0/1/16/5:s/0/0/4/4/8:w/0/16/0/0/4:u90/0/0/0/16/4:d90/0/0/0/16/4
+//    	double[][] uvs = { { 13, 7, 15, 10 }, { 0, 9, 2, 13 }, { 13, 7, 15, 10 }, { 0, 9, 2, 13 } };
+//    	ModelBlockModel.SideRotation[] rots = { ModelBlockModel.SideRotation.DEG0, ModelBlockModel.SideRotation.DEG0, ModelBlockModel.SideRotation.DEG0,
+//    	                                        ModelBlockModel.SideRotation.DEG0 };
+//    	double[] from = { 0, 3, 9 };
+//    	double[] to = { 2, 6, 13 };
+//    	
+//    	// Do normal faces, default limits
+//    	pd = new PatchDefinition();
+//    	for (int i = 0; i < faces.length; i++) {
+//    		pd.updateModelFace(from,  to, faces[i], uvs[i], rots[i], true, 0);
+//    		System.out.println("Log " + faces[i] + ": " + pd);
+//    	}    	
+//    	
 //    	// Do normal faces, default limits
 //    	pd = new PatchDefinition();
 //    	for (BlockSide face : faces) {
@@ -234,6 +234,6 @@ public class PatchDefinitionFactory implements RenderPatchFactory {
 //    		pd.updateModelFace(from,  toquarter, face, new double[] { 4, 4, 12, 12 }, 0);
 //    		System.out.println("Full cube, middle half of texture " + face + ": " + pd);
 //    	}    	
-
-    }
+//
+//    }
 }

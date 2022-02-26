@@ -317,6 +317,8 @@ public class HDBlockModels {
     	double[] to = new double[3];
     	double xrot = 0, yrot = 0, zrot = 0;
     	double xrotorig = 8, yrotorig = 8, zrotorig = 8;
+    	int modrotx = 0, modroty = 0, modrotz = 0;	// Model level rotation
+    	boolean shade = true;
     	ArrayList<ModelBoxSide> sides = new ArrayList<ModelBoxSide>();
     };
     
@@ -677,6 +679,12 @@ public class HDBlockModels {
                         else if(av[0].equals("visibility")) {
                             if(av[1].equals("top"))
                                 p_sidevis = SideVisible.TOP;
+                            else if(av[1].equals("topflip"))
+                                p_sidevis = SideVisible.TOPFLIP;
+                            else if(av[1].equals("topflipv"))
+                                p_sidevis = SideVisible.TOPFLIPV;
+                            else if(av[1].equals("topfliphv"))
+                                p_sidevis = SideVisible.TOPFLIPHV;
                             else if(av[1].equals("bottom"))
                                 p_sidevis = SideVisible.BOTTOM;
                             else if(av[1].equals("flip"))
@@ -912,12 +920,15 @@ public class HDBlockModels {
                         	String[] prms = av[1].split(":");
                         	
                         	ModelBox box = new ModelBox();
-                        	if (prms.length > 0) {	// Handle from (from-x/y/z)
+                        	if (prms.length > 0) {	// Handle from (from-x/y/z or from-x/y/z/shadow)
                         		String[] xyz = prms[0].split("/");
-                        		if (xyz.length == 3) {
+                        		if ((xyz.length == 3) || (xyz.length == 4)) {
                         			box.from[0] = Double.parseDouble(xyz[0]);
                         			box.from[1] = Double.parseDouble(xyz[1]);
                         			box.from[2] = Double.parseDouble(xyz[2]);
+                            		if ((xyz.length >= 4) && (xyz[3].equals("false"))) {
+                        				box.shade = false;
+                            		}
                         		}
                         		else {
                                 	Log.severe("Invalid modellist FROM value (" + prms[0] + " at line " + lineNum);                        			
@@ -945,9 +956,17 @@ public class HDBlockModels {
                         		}
                         	}
                         	// Rest are faces (<side - upnsew>/<txtidx>/umin/vmin/umax/vmax> or <<side - upnsew>/<txtidx>)
+                        	// OR R/mrx/mry/mrz for model rotation
                         	for (int faceidx = 2; faceidx < prms.length; faceidx++) {
                         		String v = prms[faceidx];	
                         		String[] flds = v.split("/");
+                        		// If rotation
+                        		if (flds[0].equals("R") && (flds.length == 4)) {
+                        			box.modrotx = Integer.parseInt(flds[1]);
+                        			box.modroty = Integer.parseInt(flds[2]);
+                        			box.modrotz = Integer.parseInt(flds[3]);
+                        			continue;
+                        		}
                         		ModelBoxSide side = new ModelBoxSide();
                         		side.rot = null;
                         		if ((flds.length != 2) && (flds.length != 6)) {
@@ -1000,24 +1019,31 @@ public class HDBlockModels {
 						for (ModelBox bl : boxes) {
 							// Loop through faces
 							for (ModelBoxSide side : bl.sides) {
-								PatchDefinition patch = pdf.getModelFace(bl.from, bl.to, side.side, side.uv, side.rot, side.textureid);
+								PatchDefinition patch = pdf.getModelFace(bl.from, bl.to, side.side, side.uv, side.rot, bl.shade, side.textureid);
 								if (patch != null) {
 									// If any rotations, apply them here
 									if ((bl.xrot != 0) || (bl.yrot != 0) || (bl.zrot != 0)) {
 										patch = pdf.getPatch(patch, -bl.xrot, -bl.yrot, -bl.zrot, 
 											new Vector3D(bl.xrotorig / 16, bl.yrotorig / 16, bl.zrotorig / 16),
 											patch.textureindex);
+										if (patch == null) continue;
 									}
+									// If model rotation, apply too
+		                            if ((bl.modrotx != 0) || (bl.modroty != 0) || (bl.modrotz != 0)) {
+		                            	patch = pdf.getPatch(patch, bl.modrotx, bl.modroty, bl.modrotz, patch.textureindex);
+										if (patch == null) continue;
+		                            }									
 									pd.add(patch);
 								}
 								else {
-	                            	Log.severe(String.format("Invalid modellist patch for box %f/%f/%f:%f/%f/%f side %s at line %d", bl.from[0], bl.from[1], bl.from[2], bl.to[0], bl.to[1], bl.to[2], side.side, lineNum));
+	                            	Log.severe(String.format("Invalid modellist patch for box %.02f/%.02f/%.02f:%.02f/%.02f/%.02f side %s at line %d", bl.from[0], bl.from[1], bl.from[2], bl.to[0], bl.to[1], bl.to[2], side.side, lineNum));
+	                            	Log.verboseinfo(String.format("line = %s:%s", typeid, line));
 								}
 							}
                         }
                         PatchDefinition[] patcharray = new PatchDefinition[pd.size()];
                         for (int i = 0; i < patcharray.length; i++) {
-                            patcharray[i] = pd.get(i);
+                        	patcharray[i] = pd.get(i);                            	
                         }
                         if (patcharray.length > max_patches)
                             max_patches = patcharray.length;

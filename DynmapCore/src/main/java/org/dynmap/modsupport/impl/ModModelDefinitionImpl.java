@@ -26,6 +26,7 @@ import org.dynmap.renderer.RenderPatchFactory.SideVisible;
 import org.dynmap.utils.PatchDefinition;
 import org.dynmap.utils.PatchDefinitionFactory;
 
+@SuppressWarnings("deprecation")
 public class ModModelDefinitionImpl implements ModModelDefinition {
     private final ModTextureDefinitionImpl txtDef;
     private boolean published = false;
@@ -61,12 +62,14 @@ public class ModModelDefinitionImpl implements ModModelDefinition {
     }
 
     @Override
+    @Deprecated
     public VolumetricBlockModel addVolumetricModel(int blockid, int scale) {
         VolumetricBlockModelImpl mod = new VolumetricBlockModelImpl(blockid, this, scale);
         blkModel.add(mod);
         return null;
     }
     @Override
+    @Deprecated
     public VolumetricBlockModel addVolumetricModel(String blockname, int scale) {
         VolumetricBlockModelImpl mod = new VolumetricBlockModelImpl(blockname, this, scale);
         blkModel.add(mod);
@@ -74,6 +77,7 @@ public class ModModelDefinitionImpl implements ModModelDefinition {
     }
 
     @Override
+    @Deprecated
     public StairBlockModel addStairModel(int blockid) {
         StairBlockModelImpl mod = new StairBlockModelImpl(blockid, this);
         blkModel.add(mod);
@@ -87,6 +91,7 @@ public class ModModelDefinitionImpl implements ModModelDefinition {
     }
 
     @Override
+    @Deprecated
     public WallFenceBlockModel addWallFenceModel(int blockid, FenceType type) {
         WallFenceBlockModelImpl mod = new WallFenceBlockModelImpl(blockid, this, type);
         blkModel.add(mod);
@@ -100,6 +105,7 @@ public class ModModelDefinitionImpl implements ModModelDefinition {
     }
 
     @Override
+    @Deprecated
     public CuboidBlockModel addCuboidModel(int blockid) {
         CuboidBlockModelImpl mod = new CuboidBlockModelImpl(blockid, this);
         blkModel.add(mod);
@@ -114,6 +120,7 @@ public class ModModelDefinitionImpl implements ModModelDefinition {
     }
 
     @Override
+    @Deprecated
     public PaneBlockModel addPaneModel(int blockid) {
         PaneBlockModelImpl mod = new PaneBlockModelImpl(blockid, this);
         blkModel.add(mod);
@@ -127,6 +134,7 @@ public class ModModelDefinitionImpl implements ModModelDefinition {
     }
 
     @Override
+    @Deprecated
     public PlantBlockModel addPlantModel(int blockid) {
         PlantBlockModelImpl mod = new PlantBlockModelImpl(blockid, this);
         blkModel.add(mod);
@@ -140,6 +148,7 @@ public class ModModelDefinitionImpl implements ModModelDefinition {
     }
 
     @Override
+    @Deprecated
     public BoxBlockModel addBoxModel(int blockid) {
         BoxBlockModelImpl mod = new BoxBlockModelImpl(blockid, this);
         blkModel.add(mod);
@@ -153,6 +162,7 @@ public class ModModelDefinitionImpl implements ModModelDefinition {
     }
 
     @Override
+    @Deprecated
     public DoorBlockModel addDoorModel(int blockid) {
         DoorBlockModelImpl mod = new DoorBlockModelImpl(blockid, this);
         blkModel.add(mod);
@@ -166,6 +176,7 @@ public class ModModelDefinitionImpl implements ModModelDefinition {
     }
     
     @Override
+    @Deprecated
     public PatchBlockModel addPatchModel(int blockid) {
         PatchBlockModelImpl mod = new PatchBlockModelImpl(blockid, this);
         blkModel.add(mod);
@@ -179,6 +190,7 @@ public class ModModelDefinitionImpl implements ModModelDefinition {
     }
 
     @Override
+    @Deprecated
     public PatchBlockModel addRotatedPatchModel(int blockid,
         PatchBlockModel model, int xrot, int yrot, int zrot) {
         PatchBlockModelImpl mod = new PatchBlockModelImpl(blockid, this, model, xrot, yrot, zrot);
@@ -199,12 +211,6 @@ public class ModModelDefinitionImpl implements ModModelDefinition {
         blkModel.add(mod);
         return mod;    	
     }
-    @Override
-    public ModelBlockModel addRotatedModelBlockModel(String blockname, ModelBlockModel model, int xrot, int yrot, int zrot) {
-        ModelBlockModelImpl mod = new ModelBlockModelImpl(blockname, this, model, xrot, yrot, zrot);
-        blkModel.add(mod);
-        return mod;
-    }
 
     public String getPatchID(double x0, double y0, double z0, double xu,
             double yu, double zu, double xv, double yv, double zv, double umin,
@@ -223,8 +229,8 @@ public class ModModelDefinitionImpl implements ModModelDefinition {
         return id;
     }
     
-    public String getModelFacePatchID(double[] from, double[] to, BlockSide face, double[] uv, ModelBlockModel.SideRotation rot, int textureid) {
-        PatchDefinition pd = pdf.getModelFace(from, to, face, uv, rot, textureid);
+    public String getModelFacePatchID(double[] from, double[] to, BlockSide face, double[] uv, ModelBlockModel.SideRotation rot, boolean shade, int textureid) {
+        PatchDefinition pd = pdf.getModelFace(from, to, face, uv, rot, shade, textureid);
         if (pd == null)
             return null;    // Invalid patch
         for (int i = 0; i < blkPatch.size(); i++) {
@@ -286,6 +292,15 @@ public class ModModelDefinitionImpl implements ModModelDefinition {
                         break;
                     case TOP:
                         line += ",visibility=top";
+                        break;
+                    case TOPFLIP:
+                        line += ",visibility=topflip";
+                        break;
+                    case TOPFLIPV:
+                        line += ",visibility=topflipv";
+                        break;
+                    case TOPFLIPHV:
+                        line += ",visibility=topfliphv";
                         break;
                     case FLIP:
                         line += ",visibility=flip";
