@@ -494,3 +494,9 @@ dump-missing-blocks: false
 
 # Log4J defense: string substituted for attempts to use macros in web chat
 hackAttemptBlurb: "(IaM5uchA1337Haxr-Ban Me!)"
+
+cloudflare:
+  enable: false
+  url: "https://example.com/tiles/"
+  zone_id: ""
+  token: ""
