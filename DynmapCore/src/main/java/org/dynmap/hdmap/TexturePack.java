@@ -569,7 +569,7 @@ public class TexturePack {
                 txtids[i] = ti.texture_ids.get(i).intValue();
             }
             HDBlockStateTextureMap map = new HDBlockStateTextureMap(txtids, null, ti.colorMult, ti.custColorMult, ti.blockset, true, null, ti.trans);
-            map.addToTable(ti.states);
+            map.addToTable(ti.states, -1);
         }
     }
     /**
@@ -1273,7 +1273,17 @@ public class TexturePack {
             imgs[idx].width = img.getWidth();
             imgs[idx].height = img.getHeight();
             imgs[idx].argb = new int[imgs[idx].width * imgs[idx].height];
-            img.getRGB(0, 0, imgs[idx].width, imgs[idx].height, imgs[idx].argb, 0, imgs[idx].width);
+            if (img.getType() == BufferedImage.TYPE_BYTE_GRAY) {	// We don't want alpha correction, apparently
+            	float[] buffer = new float[imgs[idx].width * imgs[idx].height];
+    			img.getData().getPixels(0, 0, imgs[idx].width, imgs[idx].height, buffer);
+            	for (int i = 0; i < imgs[idx].argb.length; i++) {
+            		int v = (int) buffer[i];
+            		imgs[idx].argb[i] = 0xFF000000 | (v << 16) | (v << 8) | v;
+            	}
+            }
+            else {
+            	img.getRGB(0, 0, imgs[idx].width, imgs[idx].height, imgs[idx].argb, 0, imgs[idx].width);
+            }
             img.flush();
             imgs[idx].isLoaded = true;
         }
@@ -2136,7 +2146,7 @@ public class TexturePack {
                         if (bsprslt.size() > 0) {
                             Integer colorIndex = (blockColorIdx >= 0)?(blockColorIdx + IMG_CNT):null;
                             HDBlockStateTextureMap map = new HDBlockStateTextureMap(faces, layers, colorMult, custColorMult, blockset, stdrot, colorIndex, trans);
-                            map.addToTable(bsprslt);
+                            map.addToTable(bsprslt, lineNum);
                             cnt++;
                         }
                         else {

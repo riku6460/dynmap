@@ -185,7 +185,6 @@ public class BukkitVersionHelperSpigot120_2 extends BukkitVersionHelper {
             //Log.info("statename=" + bname + "[" + sb + "], lightAtten=" + lightAtten);
             // Fill in base attributes
             bld.setBaseState(lastbs).setStateIndex(idx).setBlockName(bname).setStateName(sb).setAttenuatesLight(lightAtten);
-            if (bd.w() != null) { bld.setMaterial(bd.w().toString()); }
     		if (bd.e()) { bld.setSolid(); }
             if (bd.i()) { bld.setAir(); }
             if (bd.a(TagsBlock.t)) { bld.setLog(); }
@@ -362,7 +361,7 @@ public class BukkitVersionHelperSpigot120_2 extends BukkitVersionHelper {
 	}
 
 	@Override
-	public Object readTileEntityNBT(Object te) {
+	public Object readTileEntityNBT(Object te, org.bukkit.World w) {
 		TileEntity tileent = (TileEntity) te;
 		NBTTagCompound nbt = tileent.n();
         return nbt;
@@ -374,7 +373,7 @@ public class BukkitVersionHelperSpigot120_2 extends BukkitVersionHelper {
 		NBTBase val = rec.c(field);
         if(val == null) return null;
         if(val instanceof NBTTagByte) {
-            return ((NBTTagByte)val).h();
+            return ((NBTTagByte)val).i();
         }
         else if(val instanceof NBTTagShort) {
             return ((NBTTagShort)val).g();

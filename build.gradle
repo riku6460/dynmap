@@ -5,14 +5,15 @@
 buildscript {
     configurations.all {
         resolutionStrategy {
-            force("org.ow2.asm:asm:9.3")
-            force("org.ow2.asm:asm-commons:9.3")
+            force("org.ow2.asm:asm:9.5")
+            force("org.ow2.asm:asm-commons:9.5")
         }
     }
 }
 
 plugins {
-    id  "com.github.johnrengelman.shadow" version "7.1.0"
+    //id  "com.github.johnrengelman.shadow" version "7.1.0"
+    id  "io.github.goooler.shadow" version "8.1.7"
     id  'java'
     id  'maven-publish'
 }
@@ -30,6 +31,7 @@ allprojects  {
      mavenLocal()
      maven { url 'https://libraries.minecraft.net/' }
      maven { url "https://oss.sonatype.org/content/repositories/releases" }
+     maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
      maven { url "https://repo.mikeprimm.com" }
      maven { url "https://repo.maven.apache.org/maven2" }
      maven { url "https://hub.spigotmc.org/nexus/content/repositories/snapshots/" }
@@ -39,7 +41,7 @@ allprojects  {
   apply plugin: 'java'
   
   group = 'us.dynmap'
-  version = '3.7-beta-1'
+  version = '3.7-beta-8'
 
 }
 
@@ -51,7 +53,7 @@ ext {
 }
 
 subprojects {  
-  apply plugin: "com.github.johnrengelman.shadow"
+  apply plugin: "io.github.goooler.shadow"
   apply plugin: 'java'
   apply plugin: 'maven-publish'
 

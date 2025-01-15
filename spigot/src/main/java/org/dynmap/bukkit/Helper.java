@@ -40,11 +40,26 @@ public class Helper {
                 Log.info("Loading Glowstone support");
                 BukkitVersionHelper.helper = loadVersionHelper("org.dynmap.bukkit.helper.BukkitVersionHelperGlowstone");
             }
-            else if (v.contains("(MC: 1.20")) {
-            	BukkitVersionHelper.helper = loadVersionHelper("org.dynmap.bukkit.helper.v120_2.BukkitVersionHelperSpigot120_2");
+            else if (v.contains("(MC: 1.21.4")) {
+                BukkitVersionHelper.helper = loadVersionHelper("org.dynmap.bukkit.helper.v121_4.BukkitVersionHelperSpigot121_4");
+            }
+            else if (v.contains("(MC: 1.21.2") || v.contains("(MC: 1.21.3")) {
+                BukkitVersionHelper.helper = loadVersionHelper("org.dynmap.bukkit.helper.v121_3.BukkitVersionHelperSpigot121_3");
+            }
+            else if (v.contains("(MC: 1.21)") || v.contains("(MC: 1.21.1)")) {
+                BukkitVersionHelper.helper = loadVersionHelper("org.dynmap.bukkit.helper.v121.BukkitVersionHelperSpigot121");
             }
             else if (v.contains("(MC: 1.20)") || v.contains("(MC: 1.20.1)")) {
             	BukkitVersionHelper.helper = loadVersionHelper("org.dynmap.bukkit.helper.v120.BukkitVersionHelperSpigot120");
+            }
+            else if (v.contains("(MC: 1.20.2)")) {
+            	BukkitVersionHelper.helper = loadVersionHelper("org.dynmap.bukkit.helper.v120_2.BukkitVersionHelperSpigot120_2");
+            }
+            else if (v.contains("(MC: 1.20.3)") || v.contains("(MC: 1.20.4)")) {
+            	BukkitVersionHelper.helper = loadVersionHelper("org.dynmap.bukkit.helper.v120_4.BukkitVersionHelperSpigot120_4");
+            }
+            else if (v.contains("(MC: 1.20.")) {
+            	BukkitVersionHelper.helper = loadVersionHelper("org.dynmap.bukkit.helper.v120_5.BukkitVersionHelperSpigot120_5");
             }
             else if (v.contains("(MC: 1.19)") || v.contains("(MC: 1.19.1)") || v.contains("(MC: 1.19.2)")) {
             	BukkitVersionHelper.helper = loadVersionHelper("org.dynmap.bukkit.helper.v119.BukkitVersionHelperSpigot119");
