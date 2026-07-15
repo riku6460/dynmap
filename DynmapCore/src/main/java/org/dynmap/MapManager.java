@@ -913,6 +913,7 @@ public class MapManager {
                             }
                             else { 
                                 core.listenerManager.processWorldEvent(EventType.WORLD_SPAWN_CHANGE, w);
+                                last_worldborder.put(w.getName(), wb);
                             }
                         }
                         /* Tick invalidated tiles processing */

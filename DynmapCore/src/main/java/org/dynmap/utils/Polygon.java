@@ -1,6 +1,7 @@
 package org.dynmap.utils;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class Polygon {
     public static class Point2D {
@@ -8,6 +9,18 @@ public class Polygon {
         public Point2D(double x, double y) {
             this.x = x;
             this.y = y;
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+            if (!(o instanceof Point2D)) return false;
+            final Point2D point2D = (Point2D) o;
+            return Double.compare(x, point2D.x) == 0 && Double.compare(y, point2D.y) == 0;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(x, y);
         }
     }
     
@@ -132,5 +145,17 @@ public class Polygon {
             rslt.v = newpoly;
         }
         return rslt;
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (!(o instanceof Polygon)) return false;
+        final Polygon polygon = (Polygon) o;
+        return Objects.equals(v, polygon.v);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(v);
     }
 }
