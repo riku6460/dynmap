@@ -6,6 +6,14 @@ function createMinecraftHead(player,size,completed,failed) {
 	faceImage.onerror = function() {
 		failed();
 	};
+	if (typeof dynmap.options.url.skins === 'string') {
+		if (size === 'body') {
+			faceImage.src = `${dynmap.options.url.skins}/body/${encodeURIComponent(player)}/32`;
+		} else {
+			faceImage.src = `${dynmap.options.url.skins}/helm/${encodeURIComponent(player)}/${size}`;
+		}
+		return;
+	}
 	var faceimg;
 	if(size == 'body')
 		faceimg = 'faces/body/' + encodeURIComponent(player) + '.png';

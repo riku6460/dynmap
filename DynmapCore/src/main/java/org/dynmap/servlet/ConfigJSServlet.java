@@ -47,6 +47,12 @@ public class ConfigJSServlet extends HttpServlet {
         /* Get markers URL */
         sb.append("  markers: '");
         sb.append(core.configuration.getString("url/markers", "tiles/"));
+        String skinsUrl = core.configuration.getString("url/skins");
+        if (skinsUrl != null) {
+            sb.append("',\n");
+            sb.append("  skins: '");
+            sb.append(skinsUrl);
+        }
         sb.append("'\n }\n};\n");
         outputBytes = sb.toString().getBytes(cs_utf8);
     }

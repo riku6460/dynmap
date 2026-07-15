@@ -268,6 +268,12 @@ public class JsonFileClientUpdateComponent extends ClientUpdateComponent {
         /* Get markers URL */
         sb.append("  markers: '");
         sb.append(core.configuration.getString("url/markers", store.getMarkersURI(login_enabled)));
+        String skinsUrl = core.configuration.getString("url/skins");
+        if (skinsUrl != null) {
+            sb.append("',\n");
+            sb.append("  skins: '");
+            sb.append(skinsUrl);
+        }
         sb.append("'\n }\n};\n");
         
         byte[] outputBytes = sb.toString().getBytes(cs_utf8);

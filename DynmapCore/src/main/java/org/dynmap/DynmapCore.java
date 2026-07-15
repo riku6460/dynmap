@@ -636,9 +636,11 @@ public class DynmapCore implements DynmapCommonAPI {
         if (markerapi != null) {
         	MarkerAPIImpl.completeInitializeMarkerAPI(markerapi);
         }
-        
-        playerfacemgr = new PlayerFaces(this);
-        
+
+        if (configuration.getString("url/skins") == null) {
+            playerfacemgr = new PlayerFaces(this);
+        }
+
         updateConfigHashcode(); /* Initialize/update config hashcode */
         
         loginRequired = configuration.getBoolean("login-required", false);
