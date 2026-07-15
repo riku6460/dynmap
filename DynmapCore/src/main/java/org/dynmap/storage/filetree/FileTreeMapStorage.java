@@ -271,7 +271,7 @@ public class FileTreeMapStorage extends MapStorage {
                     }
 
                     List<String> paths = new ArrayList<>();
-                    for (int i = 0; i < 30 && !cloudflarePurges.isEmpty(); i++) {
+                    for (int i = 0; i < 100 && !cloudflarePurges.isEmpty(); i++) {
                         paths.add(cloudflarePurges.poll());
                     }
 
@@ -292,15 +292,30 @@ public class FileTreeMapStorage extends MapStorage {
                             writer.write(object.toJSONString());
                         }
 
-                        connection.getResponseCode();
+                        int code = connection.getResponseCode();
                         connection.disconnect();
+                        if (code == 429) {
+                            Log.warning("Cloudflare cache purge rate limited, retrying in 12 seconds");
+                            try {
+                                Thread.sleep(12000);
+                            } catch (InterruptedException e) {
+                                Thread.currentThread().interrupt();
+                                return;
+                            }
+                        }
+                        if (code != 200) {
+                            if (code != 429) {
+                                Log.severe("Error purging Cloudflare cache: " + code);
+                            }
+                            cloudflarePurges.addAll(paths);
+                        }
                     } catch (IOException e) {
                         cloudflarePurges.addAll(paths);
-                        e.printStackTrace();
+                        Log.severe("Error purging Cloudflare cache", e);
                     }
                 }
             };
-            timer.scheduleAtFixedRate(task, 0, 1000);
+            timer.schedule(task, 0, 1000);
         }
 
         return true;
@@ -706,7 +721,7 @@ public class FileTreeMapStorage extends MapStorage {
                     f.renameTo(fold);
                     fnew.renameTo(f);
 
-                    if (!Arrays.equals(Files.readAllBytes(f.toPath()), Files.readAllBytes(fold.toPath()))) {
+                    if (fold.length() != len || !Arrays.equals(Files.readAllBytes(f.toPath()), Files.readAllBytes(fold.toPath()))) {
                         String path = baseTileDir.toURI().relativize(f.toURI()).getPath();
                         if (File.separator.equals("\\")) {
                             path = path.replace("\\", "/");
